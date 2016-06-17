@@ -1,0 +1,9 @@
+---
+title: 'Travail de Bachelor – RTS Express Live\newline Rapport intermédiaire'
+author: '\protect\parbox{\textwidth}{\protect\centering Auteur: Sacha Bron\\ Superviseurs:\\ Olivier Liechti – Professeur à l''HEIG-VD\\ Sébastien Noir – Chef de projet à la RTS}'
+lang: fr-CH
+documentclass: memoir
+mainfont: 'Linux Libertine'
+fontsize: 11pt
+abstract: 'RTS Express Live est une application mobile permettant aux journalistes de diffuser en direct des images issues de leurs téléphones.\newpage'
+...
