@@ -1,4 +1,10 @@
-# Travail de Bachelor
+# Travail de Bachelor – Rapport intermédiaire
+
+Nom du projet: RTS Express Live
+
+Auteur: Sacha Bron
+
+Superviseurs: Olivier Liechti – Professeur à l'HEIG-VD, Sébastien Noir – Chef de projet à la RTS
 
 ## Sommaire
 
@@ -29,6 +35,7 @@
 	- Prochaines étapes
 	- Analyse de risques
 	- Stratégie de mitigation des risques
+- Références
 
 ## Préambule
 
@@ -180,6 +187,32 @@ La capture vidéo nécessite l'utilisation du framework AVFoundation. Il permet,
 
 Les fichiers enregistré peuvent l'être au format MPEG-4 (_.mp4_) ou Quicktime (_.mov_). Étant donné que MPEG-DASH semble supporter le MPEG-4, j'ai choisi d'enregistrer dans ce format.
 
+Afin d'utiliser la caméra du téléphone, il faut tout d'abord choisir le bon dispositif de capture (dans notre cas, la caméra principale). Cela peut se faire avec le code suivant:
+
+```swift
+let captureSession = AVCaptureSession()
+
+// Parcourt de tous les dispositifs de capture du téléphone
+for device in AVCaptureDevice.devices() {
+
+	// On vérifie qu'il gère la vidéo et qu'il s'agit de la caméra arrière
+	if (device.hasMediaType(AVMediaTypeVideo) && device.position == AVCaptureDevicePosition.Back) {
+		captureDevice = device as? AVCaptureDevice
+
+		// On peut commencer la capture de la vidéo
+		captureSession.addInput(AVCaptureDeviceInput(device: captureDevice))
+
+		// On crée un calque de prévisualisation de la caméra auquel on lie l'image reçue
+		previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+		parentLayer.addSublayer(previewLayer!)
+		previewLayer?.frame = parentLayer.frame
+
+		// On démarre l'enregistrement
+		captureSession.startRunning()
+	}
+}
+```
+
 ### Conversion vidéo
 
 Le prototype de conversion vidéo est celui qui m'a posé le plus de problème dans ce projet, mais il m'a aidé à comprendre beaucoup de chose par la pratique.
@@ -202,6 +235,37 @@ Ce prototype m'a pris de nombreuses heures à faire fonctionner parce que l'ense
 ### Envoi de données
 
 Comme mentionné précédement, l'envoi des fragments vidéo se fait via HTTP. Le développement d'une petite application envoyant une requête de type POST sur un serveur et contenant un payload m'a permi de testé cette fonctionnalité.
+
+Au niveau du code, executer une requête POST en HTTP est relativement simple.
+
+_Note: ce code a été simplifié afin de n'y garder que les aspects essentiels._
+
+```swift
+// URL et méthode
+var request = NSMutableURLRequest(URL: "http://example.com/endpoint")
+request.HTTPMethod = "POST"
+
+// En-têtes
+let boundary = "string that express the end of the file";
+let contentType = "multipart/form-data; boundary=" + boundary
+let mimeType = "video/mp4"
+
+// Ajout des en-têtes à la requête
+request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+
+// Création du payload
+var payload = "--\(boundary)\r\n" +
+		"Content-Disposition: form-data; name=\"\("uploadFile")\"; filename=\"\(fileName)\"\r\n" +
+		"Content-Type: \(mimeType)\r\n\r\n" +
+		String(contentsOfFile: filePath)! + "\r\n" +
+		"--\(boundary)--\r\n"
+
+// Ajout du payload à la requête
+request.HTTPBody = (payload as NSString).dataUsingEncoding(NSUTF8StringEncoding)
+
+// Envoi de la requête asynchrone
+NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue(), completionHandler: {})
+```
 
 ## Suite du projet
 
@@ -228,8 +292,64 @@ Les prochaines étapes de développement du projet peuvent être séparée en de
 
 ### Analyse de risques
 
+Les risques principaux à venir dans ce projet sont les suivants.
 
+#### Instabilité du logiciel
+
+La stabilité d'un logiciel est quelque chose de très important pour une entreprise. Dans le cadre de ce projet, de nombreuses personnes vont potentiellement utiliser l'application.
+
+De plus, étant donné qu'elle sera utilisée par des journalistes pour diffuser de la vidéo en direct, elle devra peut-être reporter les images d'événements importants. Il serait alors dommage que le flux vidéo s'interrompe et que des images soient perdues à cause d'erreurs dans l'application.
+
+#### Problèmes lié au réseau
+
+Comme nous l'avons vu auparavant, la transmission de la vidéo sur le réseau demande beaucoup de ressource car les fichiers vidéo comportent une importante quantité de données. De plus, les smartphones disposent de plusieurs moyens de connexion à Internet qui ont chacun leur spécificité et débit maximal. Ainsi, un téléphone connecté en wifi ou en 4G n'aura aucun problème à transmettre de la vidéo en haute définition alors que s'il est connecté en Edge, le débit de transmission sera fortement réduit et la qualité de la vidéo devra être réduite afin de transmettre en direct le fragment.
+
+Un aspect encore plus contraignant et le cas où la connexion est totalement perdue durant des dizaines de secondes. À ce moment là, il y a deux manières de reprendre le flux vidéo une fois que la connexion est rétablie. Soit les fragments vidéo sont mis dans une mémoire tampon, puis retransmis dès que la connexion revient, ou alors on ignore totalement les fragments vidéos non-transmis et on transmet le dernier fragment disponible.  
+Cette dernière solution est plus facile à mettre en place et garanti un aspect de vidéo en direct. Par contre, le spectateur pourrait rater des événements intéressants.
+
+#### Problèmes de performance
+
+Cette application est relativement gourmande en ressource car elle doit gérer la caméra du téléphone, mesurer le temps de transmission et calculer le débit binaire à appliquer sur chaque fragments, traiter les vidéos, transmettre les vidéos sur le réseau, et gérer l'interface graphique.
+
+En outre, l'application doit être capable de tourner durant plusieurs heures sans interruption. Il est alors important d'éviter toute fuite mémoire.
 
 ### Stratégie de mitigation des risques
 
+Afin d'éviter les problèmes susmentionnés, certaines mesures doivent être prises lors du développement du logiciel.
 
+Tout d'abord, un maximum de fonctions doivent être vérifiée par des tests unitaires, des tests d'integration, ainsi que des tests de régression. Une des difficulté va être d'effectuer des tests sur le traitement et la diffusion de la vidéo, étant donné que beaucoup de paramètres entrent en jeu et que la validité des tests est difficile à vérifier.
+
+Afin de tester la transmission sur des réseaux de différentes qualités, nous pouvons brider la connexion du téléphone afin que celui-ci soit obligé de diminuer la qualité de la vidéo à transmettre. Des tests durant lesquels la connexion est totalement coupée seront aussi nécessaires. Ensuite, des tests sur le terrain nous permettront de déterminer si certaines situations ont été omises, ou _a contrario_ si l'application gère correctement les variations liées au réseau.
+
+Concernant les problèmes de performances, il sera nécessaire d'effectuer des diagnostic et des profils d'utilisation du processeur et de la mémoire afin de s'assurer que l'application a assez de ressource pour fonctionner durant de longues périodes.
+
+## Références
+
+- Documentation sur AVFoundation:  
+  (https://developer.apple.com/library/ios/documentation/AudioVideo/Conceptual/AVFoundationPG/Articles/00_Introduction.html#//apple_ref/doc/uid/TP40010188)
+- Documentation sur AVCapture:  
+  (https://developer.apple.com/library/ios/documentation/AudioVideo/Conceptual/AVFoundationPG/Articles/04_MediaCapture.html#//apple_ref/doc/uid/TP40010188-CH5-SW2)
+- Documentation sur la diffusion en direct sur le web:  
+  (https://developer.mozilla.org/en-US/Apps/Fundamentals/Audio_and_video_delivery/Live_streaming_web_audio_and_video)
+- Documentation sur la diffusion adaptative (changement de débit binaire):  
+  (https://developer.mozilla.org/en-US/Apps/Fundamentals/Audio_and_video_delivery/Setting_up_adaptive_streaming_media_sources)
+- Exemple de MPEG-DASH à l'aide de FFmpeg en ligne de commande:  
+  (https://developer.mozilla.org/en-US/docs/Web/HTML/DASH_Adaptive_Streaming_for_HTML_5_Video)
+- Documentation sur les Bridging Headers:  
+  (https://developer.apple.com/library/ios/documentation/Swift/Conceptual/BuildingCocoaApps/MixandMatch.html)
+- Documentation de FFmpeg:  
+  (http://www.ffmpeg.org/)
+- Tutoriel sur la capture vidéo sur iOS:  
+  (http://jamesonquave.com/blog/taking-control-of-the-iphone-camera-in-ios-8-with-swift-part-1/)
+- StackOverflow pour une multitude de questions sur les diverses technologies ainsi que des exemples de code.:  
+  (http://stackoverflow.com/)
+- Projet payant et propiétaire de diffusion vidéo en live:  
+  (https://kickflip.io/)
+- Exemple d'envoi de fichier via HTTP:  
+  (https://gist.github.com/janporu-san/e832cdee51974fc55660)
+- Module permettant de faire du HLS:  
+  (https://github.com/hudl/iOS-FFmpeg-processor)
+- Script de compilation de FFmpeg pour iOS:  
+  (https://github.com/bbcallen/ijkplayer/blob/fc70895c64cbbd20f32f1d81d2d48609ed13f597/ios/tools/do-compile-ffmpeg.sh)
+- Wrapper de FFmpeg pour convertir des vidéos:  
+  (https://github.com/OpenWatch/FFmpegWrapper)
