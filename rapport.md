@@ -1,14 +1,33 @@
-# Préambule
+# Introduction
 
 Dans le monde d'aujourd'hui, l'information instantanée prend de plus en plus d'ampleur à travers divers vecteurs. Les différents réseaux sociaux soutiennent ce mouvement en incitant son public à partager du texte, des clichés ou encore de la vidéo. En effet, de nombreuses applications et sites web voient le jour chaque année. Parmi eux, les plus connus sont Twitch.tv: un site web de diffusion vidéo en direct utilisé surtout par les amateurs de jeu vidéo, Periscope: une application mobile permettant la diffusion en direct depuis la caméra du smartphone vers d'autres smartphones à travers le monde, et la majorité des grands acteurs du web ont ajouté cette fonctionnalité à leurs sites web: YouTube, Facebook, Snapchat, etc.
 
-Ce phénomène contraint les médias "classiques" à continuer à s'adapter aux nouvelles technologies de communication. La diffusion d'information en direct prend alors une place de plus en plus importante afin de d'atteindre ce nouveau public friand d'instantané. La RTS (Radio Télévision Suisse) fait parti de ces médias dont la popularité est en jeu. Il n'est donc pas étonnant qu'ils souhaitent aussi participer à l'expension de cette nouvelle manière de partager l'information. Bien évidemment, les émissions et retransmission d'évenements en direct n'est pas chose nouvel pour une chaîne de télévision mais la différence réside aussi dans la manière de procéder. En effet, en ayant une application de diffusion en direct sur leurs téléphones, les journalistes ont la libérté de créer du contenu à tout moment et sans préparation. Cela peut-être très pratique pour émettre les images d'un festival de musique, d'un incendie qui vient de débuter ou encore d'interviewer une célébrité que l'on croiserait par hasard.
+Ce phénomène contraint les médias "classiques" à continuer à s'adapter aux nouvelles technologies de communication. La diffusion d'information en direct prend alors une place de plus en plus importante afin de d'atteindre ce nouveau public friand d'instantané. La RTS (Radio Télévision Suisse) fait partie de ces médias dont la popularité est en jeu. Il n'est donc pas étonnant qu'ils souhaitent aussi participer à l'expension de cette nouvelle manière de partager l'information. Bien évidemment, les émissions et retransmissions d'évenements en direct n'est pas chose nouvelle pour une chaîne de télévision mais la différence réside aussi dans la manière de procéder. En effet, en ayant une application de diffusion en direct sur leurs téléphones, les journalistes ont la libérté de créer du contenu à tout moment et sans préparation. Cela peut être très pratique pour émettre les images d'un festival de musique, d'un incendie qui vient de débuter ou encore d'interviewer une célébrité que l'on croiserait par hasard.
 
-C'est pourquoi la RTS a proposé à l'HEIG-VD un travail de Bachelor ayant pour sujet la création d'une application pour iPhone permettant la diffusion en direct des images perçue par sa caméra, envoloppé dans une interface donnant la posibilité aux journalistes de s'authentifier, ainsi que d'ajouter des informations utiles concernant la capture.
+C'est pourquoi la RTS a proposé à l'HEIG-VD un travail de Bachelor ayant pour sujet la création d'une application pour iPhone permettant la diffusion en direct des images perçue par sa caméra, envoloppé dans une interface donnant la posibilité aux journalistes de s'authentifier, ainsi que d'ajouter des informations utiles concernant la capture. Ce travail a alors été effectué en collaboration avec la RTS qui a, par exemple, fourni le cahier des charges.
 
-# État de l'art
+Ce projet est constitué de trois phases:
+
+- une phase de recherche comprenant les différents protocoles de diffusion en direct ainsi que leurs formats audio et vidéo, les applications déjà existantes, des bibliothèques qui peuvent être utile au développement d'un tel projet, des possibilités qu'offrent iOS, etc.
+- une phase de création de prototypes, permettant de vérifier la faisabilité du projets et l'exploration approfondie des bibliothèques susmentionnées. Cette phase m'a aussi permis de me familiariser avec le développement sur iOS et tout ce que cela comprend (apprentissage du langage de programmation Swift, maitrise du logiciel Xcode, etc.).
+- une phase de création de l'application finale, reprenant les concepts et algorithmes des prototypes. C'est cette application qui sera livrée à la RTS.
+
+Ce rapport explique en détail le travail qui a été effectué durant ces différentes phases, les problèmes qui sont apparus au cours du développement et les solutions qui ont été employées afin d'y remédier.  
+Ainsi, la première partie explique en détails les buts et objectifs de ce travail selon les contraintes données par la RTS.  
+La seconde partie expose les différentes technologies existantes et explore les avantages et inconvéniants de chacune des méthodes de diffusion.  
+La troisième partie documente le travail effectué sur l'application finale ainsi que son fonctionnement.
+
+# État de l'art ("vite survolé", requiert plus de détail)
 
 Cette section présente divers aspects factuels sur la diffusion de la vidéo en direct et du développement sur iOS.
+
+## Introduction sur les fichiers vidéo
+
+TODO:
+- conteneur
+- encodeur
+- débit binaire
+- Keyframes
 
 ## Introduction au diffusion vidéo en direct
 
@@ -16,31 +35,43 @@ La diffusion de vidéo en direct reste quelque chose de techniquement difficile 
 
 Tout d'abord, les fichiers vidéo comportent beaucoup de données et sont donc rapidement volumineux. Cela entraîne alors d'autres problèmes: le réseau de communication utilisé doit être capable de gérer un débit minimal afin que le temps de transmission des fichiers vidéos ne soit pas plus long que la durée de la vidéo envoyée.
 
-Pour ce travail, nous nous concentrerons uniquement sur les systèmes de streaming vidéo de type serveur-clients dans lesquels la latence n'est pas une priorité majeure et non les protocoles peer-to-peer et temps réel utilisés, par exemple, pour la vidéoconférence.
+Pour ce travail, nous nous concentrerons uniquement sur les systèmes de streaming vidéo de type client-serveur dans lesquels la latence n'est pas une priorité majeure et non les protocoles peer-to-peer et temps réel utilisés, par exemple, pour la vidéoconférence.
 
 ### Utilisation d'HTTP
 
-Les protocoles de streaming vidéo les plus répandus sont sans doute ceux basé sur HTTP.
+Les protocoles de streaming vidéo les plus répandus sont sans doute ceux basés sur HTTP.
 
-L'avantage principal d'utiliser HTTP réside dans le fait que c'est un protocol de la couche applicative du modèle OSI. Ce niveau supplémantaire d'abstraction par rapport aux couches plus basses du modèle OSI signifie que le flux vidéo peut passer par des proxys HTTP et passer à travers les les pare-feux permissif à HTTP, contrairement à TCP ou UDP qui se situe sur des couches plus basses du modèle OSI, par exemple.
+L'avantage principal d'utiliser HTTP réside dans le fait que c'est un protocole de la couche applicative du modèle OSI. Ce niveau supplémantaire d'abstraction par rapport aux couches plus basses du modèle OSI signifie que le flux vidéo peut passer par des proxys HTTP et passer à travers les les pare-feux permissif à HTTP, contrairement à TCP ou UDP qui se situe sur des couches plus basses du modèle OSI, par exemple.
 
-En outre, ses inconvéniants majeurs sont les contraintes qu'ils présentent quant à la manière de gérer les données. Par exemple, un protocole de diffusion de vidéo basé sur UDP pourraient simplement envoyer le flux de bytes de la vidéo à travers le réseau avec peu de traitements sur les données. Par contre, avec l'utilisation d'HTTP, les données doivent être contenues dans des fichiers. La vidéo doit alors être découpée en une mulitude de fichiers vidéo, aussi appelés fragments, qui seront envoyés un par un sur le réseau. Cette contraite nous oppose à plusieurs choix, dont celui de la durée de ces fragments de vidéo. En effet, si les fragments sont trop longs, la latence entre la capture de l'image et sa récéption va fortement augmenter car le smartphone devra attendre que le fragment soit complet avant de l'envoyer, et son visionage ne pourra commencer qu'à ce moment-là.
+En outre, ses inconvéniants majeurs sont les contraintes qu'ils présentent quant à la manière de gérer les données. Par exemple, un protocole de diffusion de vidéo basé sur UDP pourraient simplement envoyer le flux de bytes de la vidéo à travers le réseau avec peu de traitements sur les données. Par contre, avec l'utilisation d'HTTP, les données doivent être contenues dans les requêtes ou les réponses, ou dans des fichiers (car HTTP requiert des en-têtes relativement lourd et envoyer seulement quelques bytes de cette manière serait inefficace). La vidéo doit alors être découpée en une mulitude de fichiers vidéo, aussi appelés segments, qui seront envoyés un par un sur le réseau. Cette contraite nous oppose à plusieurs choix, dont celui de la durée de ces segments de vidéo. En effet, si les segments sont trop longs, la latence entre la capture de l'image et sa récéption va fortement augmenter car le smartphone devra attendre que le segment soit complet avant de l'envoyer, et son visionage ne pourra commencer qu'à ce moment-là.
 
 ### RTMP
 
-RTMP (Real-Time Messaging Protocol) est un protocol de communication permettant le streaming de vidéo. Il a été développé par Macromedia (aujourd'hui Adobe) et se base sur un client en Flash. Il est basé sur HTTP et utilise des vidéos au format FLV (Flash Video) et de l'audio en MP3 ou AAC.
+RTMP (Real-Time Messaging Protocol) est un protocole de communication permettant le streaming de vidéo. Il a été développé par Macromedia (aujourd'hui Adobe) et se base sur un client en Flash. Il est basé sur HTTP et utilise des vidéos au format FLV (Flash Video) et de l'audio en MP3 ou AAC.
 
-Les principaux inconvéniants de ce protocol est qu'il est très lié aux clients Flash et que ces derniers sont aujourd'hui de plus en plus remplacés par les technologies HTML5. De plus, même si ce protocol est largement documenté, il est propriétaire.
+Les principaux inconvéniants de ce protocole est qu'il est très lié aux clients Flash et que ces derniers sont aujourd'hui de plus en plus remplacés par les technologies HTML5. De plus, même si ce protocole est largement documenté, il est propriétaire.
 
 RTMP est aujourd'hui utilisé par beaucoup de plateforme de streaming vidéo, comme Twitch.tv ou encore Periscope.
 
 ### HLS
 
-HLS (HTTP Live Streaming) est un système de streaming vidéo développé par Apple et basé sur HTTP. Il utilise un conteneur MPEG-2 TS et le codec H.264 pour ses fragments vidéo et supporte le MP3 et le AAC pour le transport du son.
+HLS (HTTP Live Streaming) est un système de streaming vidéo développé par Apple et basé sur HTTP. Il utilise un conteneur MPEG-2 TS et le codec H.264 pour ses segments vidéo et supporte le MP3 et le AAC pour le transport du son.
+
+Une liste de lecture dynamique, aussi appelée manifeste, est nécessaire afin d'indiquer au client à quelle adresse il doit aller chercher les prochains segments vidéo. Ce manifeste est au format M3U8. Il doit aussi préciser la durée de chaque segment ainsi que le type de flux média qu'il représente. Il doit aussi indiquer si le flux est fini ou si d'autres segments sont susceptibles d'être ajoutés.
+
+Les manifestes M3U8 peuvent en réalité représenter divers types d'utilisation des flux média. Dans notre cas, deux types de représentation nous intéressent: les "fenêtres glissantes" (_sliding window playlist_) et "événements" (_event playlist_). Toutes deux représentent une diffusion en direct. Cepandant, les listes de lecture à fenêtres glissantes permettent de faire des diffusions en live sur de très longues durées, car la liste de lecture ne présentent que des liens vers les derniers segments vidéos. Les listes de lecture de type événements, quant à elles, ont été crées plus particulièrement pour des événements à durée définie. Leur avantage principal est de permettre à l'utilisateur de lire le flux depuis le début.
+
+Au final, la solution à fenêtres glissantes est intéressante car elle nous permet de choisir la taille de la fenêtre, et même de lui donner une taille infinie, permettant alors de simuler un flux de type "événement".
+
+Afin de créer un flux vidéo au débit adaptatif, il est possible de préciser le débit binaire des segments vidéo. Le logiciel client pourra alors choisir les segments qui correspondent le mieux à sa bande passante disponible.
 
 ### MPEG-DASH
 
 MPEG-DASH (MPEG pour Moving Picture Experts Group et et DASH pour Dynamic Adaptive Streaming over HTTP) est un système de streaming vidéo, également basé sur HTTP. Contrairement à RTMP et à HLS, MPEG-DASH ne dépend d'aucun codec. De plus, il supporte plusieurs format de conteneur. Il est alors capable d'envoyer des vidéos en MPEG-2 TS (comme HLS) ainsi que du MPEG-4 et les formats similaires.
+
+Ce protocole nécessite d'avoir des segments vidéo ne contenant que les données de la vidéo (et non les en-têtes). Il faut alors stocker les en-têtes dans un fichier séparé.
+
+MPEG-DASH se repose aussi sur l'utilisation d'un manifeste contenant des liens vers les segments vidéos ainsi que des meta-données. Ces fichiers sont en XML.
 
 Support des différentes technologies selon les navigateurs[^1]:
 
@@ -84,7 +115,7 @@ Swift est un langage de programmation conçu et maintenu par Apple. Sorti il y a
 
 Un des inconvéniants lors du changement de langage de programmation pour une plateforme est le portage de toutes les bibliothèques écrites dans le langage précédant. Pour le développement sur iOS, ce problème a été contourné de manière intelligente: les bibliothèques écrites en Objective-C peuvent être utilisée telle quelle par l'application, à condition de fournir un petit fichier appelé "Bridging Header". Ce fichier permet à Swift de savoir quel type de fonction, d'objet et de classe il peut utiliser. Cela permet donc d'appeler des bibliothèques Objective-C depuis du Swift et éviter de devoir porter de grandes quantités de code.
 
-Une des problèmes de cette méthode est que nous devrions appeler les fonctions Objective-C en leur passant des types Objective-C depuis Swift. Il pourrait être alors problématique de convertir les variables typées en Swift en types Objective-C. Heureusement, Swift est capable de convertir implicitement les types les plus communs. Par exemple, une `String` pourra être implicitement convertie en `NSString` pour que le code en Objective-C puisse l'interpréter correctement.
+Un des problèmes de cette méthode est que nous devrions appeler les fonctions Objective-C en leur passant des types Objective-C depuis Swift. Il pourrait être alors problématique de convertir les variables typées en Swift en types Objective-C. Heureusement, Swift est capable de convertir implicitement les types les plus communs. Par exemple, une `String` pourra être implicitement convertie en `NSString` pour que le code en Objective-C puisse l'interpréter correctement.
 
 ![Schéma des liens possibles entre Objective-C (.m et .h) et Swift](img/bridging-header.png)
 
@@ -96,70 +127,6 @@ Une fois la bibliothèque compilée pour l'iPhone, nous pouvons l'inclure dans X
 
 Au niveau des types de variables, Swift est aussi capable de comprendre et convertir les variables issues de C, par exemple.
 
-# Cahier des charges
-
-Ce cahier des charges a été fourni par Sébastien Noir, chef de projet à la RTS.
-
-## Contexte
-
-La RTS (Radio Télévision Suisse) propose à côté de son offre télévision / radio traditionnelle
-une large gamme de produits en ligne : Play RTS, RTS Sport, RTS Info, RTS Radio, RTS
-Kids.
-
-La publication de contenus vidéos live a profondément changé récemment, avec l'arrivée
-d'application mobile telles que Meerkat et Persicope. La RTS souhaite se doter d'un outil
-permettant aux journalistes de publier immédiatement en live des vidéos sur le terrain.
-
-## Objectifs
-
-Ce travail consiste à offrir la possibilité aux journalistes de diffuser en direct de la vidéo
-depuis leur téléphone.
-
-### Objectifs principaux
-
-- Diffusion vidéo + audio en direct depuis un smartphone
-- Intégration à l'application RTS Express iOS existante
-- Authentification des utilisateurs par maRTS
-- Possibilité d'ajouter des métadonnées : titre, description, mot clés
-- Interface simple
-- Possibilité de disposer d'un enregistrement du live.
-- La qualité de la vidéo est aussi bonne que possible.
-- Intégration dans le workflow vidéo RTS
-
-### Objectifs secondaires
-
-- Intégration avec le centre de diffusion RTS / SSR
-- Optimisation du temps de propagation (latence entre la captation et la diffusion)
-- Module indépendant pouvant être intégré dans toutes les apps natives.
-- Diffusion en parallèle sur YouTube
-
-## Critères d'acceptation
-
-- L'outil est simple d'utilisation
-- L'outil est rapide
-- Logiciel de qualité : code commenté et versionné, tests automatisés,...
-- Sécurité des données bien maitrisée
-- Projet déployé sur l'infrastructure RTS
-- Résilience du logiciel aux coupures réseau
-- Etude de différentes solutions techniques, notamment encodage de la vidéo en local / sur le serveur
-
-## Remarque
-
-Une bonne connaissance de plusieurs protocoles réseaux est un atout.
-
-## Domaines de recherche
-
-- Développement mobile
-- Authentification
-- Sécurité
-- Programmation Orientée Objet
-- UI / UX
-- Gestion des médias
-- Cloud
-- Vidéo
-- Compression vidéo
-- Réseau
-
 # Approche du problème
 
 Comme la plupart des technologies susmentionnées m'étaient inconnues avant de commencer ce travail, j'ai commencé par me documenter et faire des recherches sur l'état de l'art ainsi que sur le futur de ces différents systèmes. En effet, ce genre d'application étant relativement moderne, il est utile d'essayer de prédire comment vont se développer les technologies de diffusion vidéo ainsi que leur support. Par exemple, l'abandon progressif des technologies Flash au profit d'HTML5 par les navigateurs constitue un paramètre non négligeable dans la création d'application de demain.
@@ -170,7 +137,7 @@ J'ai alors choisi d'utiliser FFmpeg pour les transformations sur la vidéo (déb
 
 Après m'être renseigné sur les différents protocoles de diffusion vidéo en direct, j'ai dessiné un schéma pour savoir ce que devait effectuer l'application afin de pouvoir atteindre les objectifs donnés.
 
-![Schéma représentant le cheminement des fragments vidéo](img/fragments-flow.png)
+![Schéma représentant le cheminement des segments vidéo](img/segments-flow.png)
 
 Par la suite, puisque je ne connaissais ni l'environnement de programmation sur iOS, ni le langage Swift, je me suis documenté et familiarisé avec celui-ci. J'ai ensuite développé des petites applications simple pour mieux comprendre comment utiliser les divers outils offert par Apple. Cela m'a aussi permis de comprendre des subtilité de Swift.
 
@@ -238,7 +205,7 @@ Ce prototype m'a pris de nombreuses heures à faire fonctionner parce que l'ense
 
 ## Envoi de données
 
-Comme mentionné précédement, l'envoi des fragments vidéo se fait via HTTP. Le développement d'une petite application envoyant une requête de type POST sur un serveur et contenant un payload m'a permi de testé cette fonctionnalité.
+Comme mentionné précédement, l'envoi des segments vidéo se fait via HTTP. Le développement d'une petite application envoyant une requête de type POST sur un serveur et contenant un payload m'a permi de testé cette fonctionnalité.
 
 Au niveau du code, executer une requête POST en HTTP est relativement simple.
 
@@ -279,12 +246,12 @@ Pour la suite du projet, la partie de prototypage touchera à sa fin assez rapid
 
 ## Prochaines étapes
 
-Les prochaines étapes de développement du projet peuvent être séparée en deux groupe et sont les suivantes:
+Les prochaines étapes de développement du projet peuvent être séparée en deux groupes et sont les suivantes:
 
 **Gestion de la vidéo:**
 
-- Découpe de la vidéo live en fragments à la volée
-- Envoi des fragments vidéo sur un serveur distant
+- Découpe de la vidéo live en segments à la volée
+- Envoi des segments vidéo sur un serveur distant
 - Obtention une base de streaming vidéo fonctionnelle
 - Enregitrement de la vidéo complète en haute qualité
 
@@ -308,14 +275,14 @@ De plus, étant donné qu'elle sera utilisée par des journalistes pour diffuser
 
 ### Problèmes lié au réseau
 
-Comme nous l'avons vu auparavant, la transmission de la vidéo sur le réseau demande beaucoup de ressource car les fichiers vidéo comportent une importante quantité de données. De plus, les smartphones disposent de plusieurs moyens de connexion à Internet qui ont chacun leur spécificité et débit maximal. Ainsi, un téléphone connecté en wifi ou en 4G n'aura aucun problème à transmettre de la vidéo en haute définition alors que s'il est connecté en Edge, le débit de transmission sera fortement réduit et la qualité de la vidéo devra être réduite afin de transmettre en direct le fragment.
+Comme nous l'avons vu auparavant, la transmission de la vidéo sur le réseau demande beaucoup de ressource car les fichiers vidéo comportent une importante quantité de données. De plus, les smartphones disposent de plusieurs moyens de connexion à Internet qui ont chacun leur spécificité et débit maximal. Ainsi, un téléphone connecté en wifi ou en 4G n'aura aucun problème à transmettre de la vidéo en haute définition alors que s'il est connecté en Edge, le débit de transmission sera fortement réduit et la qualité de la vidéo devra être réduite afin de transmettre en direct le segment.
 
-Un aspect encore plus contraignant et le cas où la connexion est totalement perdue durant des dizaines de secondes. À ce moment là, il y a deux manières de reprendre le flux vidéo une fois que la connexion est rétablie. Soit les fragments vidéo sont mis dans une mémoire tampon, puis retransmis dès que la connexion revient, ou alors on ignore totalement les fragments vidéos non-transmis et on transmet le dernier fragment disponible.  
+Un aspect encore plus contraignant et le cas où la connexion est totalement perdue durant des dizaines de secondes. À ce moment là, il y a deux manières de reprendre le flux vidéo une fois que la connexion est rétablie. Soit les segments vidéo sont mis dans une mémoire tampon, puis retransmis dès que la connexion revient, ou alors on ignore totalement les segments vidéos non-transmis et on transmet le dernier segment disponible.  
 Cette dernière solution est plus facile à mettre en place et garanti un aspect de vidéo en direct. Par contre, le spectateur pourrait rater des événements intéressants.
 
 ### Problèmes de performance
 
-Cette application est relativement gourmande en ressource car elle doit gérer la caméra du téléphone, mesurer le temps de transmission et calculer le débit binaire à appliquer sur chaque fragments, traiter les vidéos, transmettre les vidéos sur le réseau, et gérer l'interface graphique.
+Cette application est relativement gourmande en ressource car elle doit gérer la caméra du téléphone, mesurer le temps de transmission et calculer le débit binaire à appliquer sur chaque segments, traiter les vidéos, transmettre les vidéos sur le réseau, et gérer l'interface graphique.
 
 En outre, l'application doit être capable de tourner durant plusieurs heures sans interruption. Il est alors important d'éviter toute fuite mémoire.
 
@@ -329,6 +296,8 @@ Afin de tester la transmission sur des réseaux de différentes qualités, nous 
 
 Concernant les problèmes de performances, il sera nécessaire d'effectuer des diagnostic et des profils d'utilisation du processeur et de la mémoire afin de s'assurer que l'application a assez de ressource pour fonctionner durant de longues périodes.
 
+# Conclusion (TODO)
+
 # Références
 
 - Documentation sur AVFoundation:  
@@ -337,8 +306,10 @@ Concernant les problèmes de performances, il sera nécessaire d'effectuer des d
 	\url{https://developer.apple.com/library/ios/documentation/AudioVideo/Conceptual/AVFoundationPG/Articles/04_MediaCapture.html#//apple_ref/doc/uid/TP40010188-CH5-SW2}
 - Documentation sur la diffusion en direct sur le web:  
 	\url{https://developer.mozilla.org/en-US/Apps/Fundamentals/Audio_and_video_delivery/Live_streaming_web_audio_and_video}
-- Documentation sur la diffusion adaptative (changement de débit binaire):  
+- Documentation sur la diffusion adaptative (changement de débit binaire): 
 	\url{https://developer.mozilla.org/en-US/Apps/Fundamentals/Audio_and_video_delivery/Setting_up_adaptive_streaming_media_sources}
+- Exemples de manifestes HLS:
+	\url{https://developer.apple.com/library/ios/technotes/tn2288/_index.html#//apple_ref/doc/uid/DTS40012238-CH1-TNTAG3}
 - Exemple de MPEG-DASH à l'aide de FFmpeg en ligne de commande:  
 	\url{https://developer.mozilla.org/en-US/docs/Web/HTML/DASH_Adaptive_Streaming_for_HTML_5_Video}
 - Documentation sur les Bridging Headers:  
