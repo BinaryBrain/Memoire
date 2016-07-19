@@ -29,6 +29,10 @@ TODO:
 - débit binaire
 - Keyframes
 
+
+![Exemple d'une image de vidéo peu compressée (débit binaire: 3'394 kb/s) par rapport à une image fortement compressée (débit binaire: 470 kb/s)](img/bitrate.png)
+
+
 ## Introduction au diffusion vidéo en direct
 
 La diffusion de vidéo en direct reste quelque chose de techniquement difficile à réaliser pour plusieurs raisons.
@@ -59,7 +63,7 @@ HLS (HTTP Live Streaming) est un système de streaming vidéo développé par Ap
 
 Une liste de lecture dynamique, aussi appelée manifeste, est nécessaire afin d'indiquer au client à quelle adresse il doit aller chercher les prochains segments vidéo. Ce manifeste est au format M3U8. Il doit aussi préciser la durée de chaque segment ainsi que le type de flux média qu'il représente. Il doit aussi indiquer si le flux est fini ou si d'autres segments sont susceptibles d'être ajoutés.
 
-Les manifestes M3U8 peuvent en réalité représenter divers types d'utilisation des flux média. Dans notre cas, deux types de représentation nous intéressent: les "fenêtres glissantes" (_sliding window playlist_) et "événements" (_event playlist_). Toutes deux représentent une diffusion en direct. Cepandant, les listes de lecture à fenêtres glissantes permettent de faire des diffusions en live sur de très longues durées, car la liste de lecture ne présentent que des liens vers les derniers segments vidéos. Les listes de lecture de type événements, quant à elles, ont été crées plus particulièrement pour des événements à durée définie. Leur avantage principal est de permettre à l'utilisateur de lire le flux depuis le début.
+Les manifestes M3U8 peuvent en réalité représenter divers types d'utilisation des flux média. Dans notre cas, deux types de représentation nous intéressent: les "fenêtres glissantes" (_sliding window playlist_) et "événements" (_event playlist_). Toutes deux représentent une diffusion en direct. Cepandant, les listes de lecture à fenêtres glissantes permettent de faire des diffusions en live sur de très longues durées, car la liste de lecture ne présentent que des liens vers les derniers segments vidéos. Les listes de lecture de type événements, quant à elles, ont été créées plus particulièrement pour des événements à durée définie. Leur avantage principal est de permettre à l'utilisateur de lire le flux depuis le début.
 
 Au final, la solution à fenêtres glissantes est intéressante car elle nous permet de choisir la taille de la fenêtre, et même de lui donner une taille infinie, permettant alors de simuler un flux de type "événement".
 
@@ -129,29 +133,27 @@ Au niveau des types de variables, Swift est aussi capable de comprendre et conve
 
 # Approche du problème
 
-Comme la plupart des technologies susmentionnées m'étaient inconnues avant de commencer ce travail, j'ai commencé par me documenter et faire des recherches sur l'état de l'art ainsi que sur le futur de ces différents systèmes. En effet, ce genre d'application étant relativement moderne, il est utile d'essayer de prédire comment vont se développer les technologies de diffusion vidéo ainsi que leur support. Par exemple, l'abandon progressif des technologies Flash au profit d'HTML5 par les navigateurs constitue un paramètre non négligeable dans la création d'application de demain.
+La première partie du projet a consisté en la familiarisation avec les technologies susmentionnées, effectuer des recherches sur l'état de l'art ainsi que sur le futur de ces différents systèmes. En effet, ce genre d'application étant relativement moderne, il est utile d'essayer de prédire comment vont se développer les technologies de diffusion vidéo ainsi que leur support. Par exemple, l'abandon progressif des technologies Flash au profit d'HTML5 par les navigateurs constitue un paramètre non négligeable dans la création d'application de demain.
 
-Une fois bien documenté, j'ai commencé à rechercher s'il existait déjà des bibliothèques ou des frameworks libres et/ou gratuit permettant de mettre en place un système de streaming depuis l'iPhone mais la grande majorité de ses systèmes sont payants, très souvent par mois, et incluent tout l'écosystème (application(s), serveurs cloud, parfois même client(s)).  
-Je me suis d'abord penché sur les possiblité qu'offre AVFoundation, un framework d'audio-visuel fourni par Apple. Cependant, j'ai trouvé celui-ci relativement incomplet par rapport à l'utilisation particulière de la vidéo pour ce projet.  
-J'ai alors choisi d'utiliser FFmpeg pour les transformations sur la vidéo (débit binaire, encodage, conteneur, fusion) car c'est une bibliothèque très largement utilisée, aussi par les grandes entreprises, qu'elle permet de faire toute les opérations désirées. En outre, le projet actif depuis plus de 15 ans, ce qui est signe d'une grande stabilité et qu'il y a beaucoup de chance qu'elle continue à être supportée dans les années à venir.
+Une fois documenté, une phase de recherche de bibliothèques et de frameworks libres ou gratuits permettant de mettre en place un système de streaming depuis l'iPhone a débuter. Malheureusement, la grande majorité de ses systèmes sont payants, très souvent par mois, et incluent l'entier de l'écosystème (application(s), serveurs cloud, parfois même client(s)).
 
-Après m'être renseigné sur les différents protocoles de diffusion vidéo en direct, j'ai dessiné un schéma pour savoir ce que devait effectuer l'application afin de pouvoir atteindre les objectifs donnés.
+Il est intéressant de noter que les possiblité qu'offre AVFoundation, un framework d'audio-visuel fourni par Apple sont relativement faibles par rapport à l'utilisation particulière de la vidéo pour ce projet.
 
-![Schéma représentant le cheminement des segments vidéo](img/segments-flow.png)
+Cepandant, les bibliothèques fournies par FFmpeg pour les transformations sur la vidéo (débit binaire, encodage, conteneur, fusion) car c'est une bibliothèque très largement utilisée, aussi par les grandes entreprises, qu'elle permet de faire toute les opérations désirées. En outre, le projet actif depuis plus de 15 ans, ce qui est signe d'une grande stabilité et qu'il y a beaucoup de chance qu'elle continue à être supportée dans les années à venir.
 
-Par la suite, puisque je ne connaissais ni l'environnement de programmation sur iOS, ni le langage Swift, je me suis documenté et familiarisé avec celui-ci. J'ai ensuite développé des petites applications simple pour mieux comprendre comment utiliser les divers outils offert par Apple. Cela m'a aussi permis de comprendre des subtilité de Swift.
+Une fois renseigné sur les technologies existantes, une phase d'apprentissage de l'environnement de programmation sur iOS ainsi que du langage Swift a été nécessaire. Le développement de petites applications simples pour mieux comprendre comment utiliser les divers outils offert par Apple a été très utile. Il m'a aussi permis de comprendre certaines subtilité de Swift.
 
-J'ai ensuite développé quelques prototypes d'application afin de tester si la direction dans laquelle je partais étais la bonne.
+Par la suite, les premiers prototypes d'application permettant de tester les technologies de capture, conversion, et diffusion vidéo ont été créés.
 
 ## Capture vidéo
 
-La première partie que j'ai voulu testé est la capture de la vidéo à l'aide de la caméra du téléphone ainsi que son affichage à l'écran.
+La première partie à avoir été testée est la capture de la vidéo à l'aide de la caméra du téléphone ainsi que son affichage à l'écran.
 
 La capture vidéo nécessite l'utilisation du framework AVFoundation. Il permet, entre autres, une gestion avancée de la caméra (résolution, balance des blancs, ISO, etc.).
 
 ![Fonctionnement de la caputre vidéo avec AVFoundation](img/avcapture.png)
 
-Les fichiers enregistré peuvent l'être au format MPEG-4 (_.mp4_) ou Quicktime (_.mov_). Étant donné que MPEG-DASH semble supporter le MPEG-4, j'ai choisi d'enregistrer dans ce format.
+Les fichiers enregistré peuvent l'être au format MPEG-4 (_.mp4_) ou Quicktime (_.mov_). FIXME: Étant donné que MPEG-DASH semble supporter le MPEG-4, j'ai choisi d'enregistrer dans ce format.
 
 Afin d'utiliser la caméra du téléphone, il faut tout d'abord choisir le bon dispositif de capture (dans notre cas, la caméra principale). Cela peut se faire avec le code suivant:
 
@@ -186,22 +188,7 @@ for device in AVCaptureDevice.devices() {
 
 ## Conversion vidéo
 
-Le prototype de conversion vidéo est celui qui m'a posé le plus de problème dans ce projet, mais il m'a aidé à comprendre beaucoup de chose par la pratique.
-
-La partie qui m'a posé le plus de difficulté était sans doute d'appeler les différentes fonctions de FFmpeg depuis mon code Swift. En effet, je n'avais jamais essayer de lier des bibliothèques externes à XCode et à Swift. Lorsque j'ai rencontré des erreurs à la compilation lors de l'appel au linker, il m'était impossible de savoir d'où provenait l'erreur. Elle pouvait se trouver sur une multitude de niveaux:
-
-- La cross-compilation
-- La fusion des bibliothèques statiques
-- Leur inclusion au projet XCode
-- La configuration de mon projet XCode (tant au niveau des libs que des headers)
-- L'utilisation du Bringing Header
-- L'appel aux fonctions depuis Swift
-
-De plus, certaines erreurs du linker provenaient du fait que FFmpeg a besoin des bibliothèques libssl, libcrypto et libiconv.
-
-Finalement, après de nombreux essais et renseignements sur Internet, j'ai pu convertir des vidéos d'un format à l'autre, changeant non seulement le format du conteneur mais aussi le codec utilisé.
-
-Ce prototype m'a pris de nombreuses heures à faire fonctionner parce que l'ensemble du système comporte de nombreuses couches et aussi à cause de mon manque d'expérience sur ces technologies. Cepandant, la gestion de la vidéo est une clé de voute de ce projet et ce prototype et les problèmes qu'il m'a causé m'aideront beaucoup dans la réalisation de l'application finale.
+Le prototype de conversion vidéo est celui qui a été le plus fastidieux à produire, mais sa création permet de mieux comprendre les principes de la conversion vidéo, les différents formats de fichiers, ainsi que les problèmes que l'on peut rencontrer.
 
 ## Envoi de données
 
@@ -240,61 +227,109 @@ NSURLConnection.sendAsynchronousRequest(request,
 		queue: NSOperationQueue.mainQueue(), completionHandler: {})
 ```
 
-# Suite du projet
+## Gestion des ressources
 
-Pour la suite du projet, la partie de prototypage touchera à sa fin assez rapidement et il faudra développer une application stable en se basant sur les connaissances aquises lors des dernières semaines.
+Les ressources étant limitées sur une plateforme mobile, il est important de les gérer méticuleusement. Il en va de soit pour la mémoire, la consommation énergétique (batterie) et donc des différentes puces du téléphone: processeur, module réseaux (wifi, EDGE, 3G, 4G), module vidéo (caméra, encodeurs/décodeurs), etc.
 
-## Prochaines étapes
+Dans le cas de cette application, elle est particulièrement gourmande en ressources, étant donné qu'elle doit:
 
-Les prochaines étapes de développement du projet peuvent être séparée en deux groupes et sont les suivantes:
+- Utiliser la caméra: activité sur les puces dédiées à la vidéo
+- Encoder la vidéo: activité sur les puces vidéo et sur le processeur
+- Envoyer les segments: activité réseau (puces wifi/3G/EDGE/etc.)
 
-**Gestion de la vidéo:**
+## Sécurité des données
 
-- Découpe de la vidéo live en segments à la volée
-- Envoi des segments vidéo sur un serveur distant
-- Obtention une base de streaming vidéo fonctionnelle
-- Enregitrement de la vidéo complète en haute qualité
+La securité des données sur le téléphone étant assurée par iOS, et les données stockées n'étant normalement pas extrêmement sensibles, il n'est pas nécessaire d'ajouter une couche de sécurité sur ces dernières.
 
-**Application:**
+En revanche, les segments vidéo transmis au serveur doivent être protégés. Ce niveau de sécurité doit être gérer par la partie de l'application s'occupant d'envoyer les segments sur le réseau. Heureusement, l'utilisation de HTTPS nous assure une connexion sécurisée par TLS/SSL. Il suffit alors d'utiliser un serveur muni d'un certificat TLS/SSL acceptant HTTPS et les données seront transmises de manière sûre.
 
-- Design de l'interface utilisateur
-- Implémentation de l'interface utilisateur
-- Implémentation du système d'authenficiation
-- Implémentation du système de métadonnées (titre, description, mot clés, etc.)
-- Déploiement
+# Fonctionnement de l'application
 
-## Analyse de risques
+Cette section présente le fonctionnement de l'application finale. Elle expose non seulement son utilisation du point de vue de l'utilisateur, mais révèle également son organisation interne.
 
-Les risques principaux à venir dans ce projet sont les suivants.
+![Schéma représentant le cheminement des segments vidéo](img/segments-flow.png) (TODO fragment => segment)
 
-### Instabilité du logiciel
+## Interface graphique
 
-La stabilité d'un logiciel est quelque chose de très important pour une entreprise. Dans le cadre de ce projet, de nombreuses personnes vont potentiellement utiliser l'application.
+La contrainte principale liée à l'interface graphique est qu'elle doit rester simple et ergonomique, tout en permettant à l'utilisateur d'accéder aux fonctionnalités principales.
 
-De plus, étant donné qu'elle sera utilisée par des journalistes pour diffuser de la vidéo en direct, elle devra peut-être reporter les images d'événements importants. Il serait alors dommage que le flux vidéo s'interrompe et que des images soient perdues à cause d'erreurs dans l'application.
+## Capture et conversion de la vidéo
 
-### Problèmes lié au réseau
+## Envoi des segments vidéo
 
-Comme nous l'avons vu auparavant, la transmission de la vidéo sur le réseau demande beaucoup de ressource car les fichiers vidéo comportent une importante quantité de données. De plus, les smartphones disposent de plusieurs moyens de connexion à Internet qui ont chacun leur spécificité et débit maximal. Ainsi, un téléphone connecté en wifi ou en 4G n'aura aucun problème à transmettre de la vidéo en haute définition alors que s'il est connecté en Edge, le débit de transmission sera fortement réduit et la qualité de la vidéo devra être réduite afin de transmettre en direct le segment.
+L'envoi des segments vidéo se fait via le protocole HTTP à l'aide de la méthode `POST`.
 
-Un aspect encore plus contraignant et le cas où la connexion est totalement perdue durant des dizaines de secondes. À ce moment là, il y a deux manières de reprendre le flux vidéo une fois que la connexion est rétablie. Soit les segments vidéo sont mis dans une mémoire tampon, puis retransmis dès que la connexion revient, ou alors on ignore totalement les segments vidéos non-transmis et on transmet le dernier segment disponible.  
-Cette dernière solution est plus facile à mettre en place et garanti un aspect de vidéo en direct. Par contre, le spectateur pourrait rater des événements intéressants.
+Le projet comprend un _protocol_[^2] `Uploader` définissant les principales méthodes publiques permettant l'envoi de fichier.  
+Une classe `HTTPUploader`, héritant de `Uploader` implémente lesdites méthodes afin d'envoyer des fichier via HTTP.
 
-### Problèmes de performance
+Cette architecture permet de pouvoir facilement changer de type d'Uploader dans les révisions futures de l'application. On pourrait alors imaginer un `FTPUploader` ou un `UDPUploader`, par exemple, afin d'utiliser un autre protocole.
 
-Cette application est relativement gourmande en ressource car elle doit gérer la caméra du téléphone, mesurer le temps de transmission et calculer le débit binaire à appliquer sur chaque segments, traiter les vidéos, transmettre les vidéos sur le réseau, et gérer l'interface graphique.
+[^2]: En Swift, un _protocol_ est l'équivalent d'une _interface_ Java.
 
-En outre, l'application doit être capable de tourner durant plusieurs heures sans interruption. Il est alors important d'éviter toute fuite mémoire.
+## Adaptation du débit binaire
 
-## Stratégie de mitigation des risques
+Comme nous l'avons mentionné dans la partie théorique, l'adaptation du débit binaire est primordiale afin de pouvoir continuer à diffuser même quand la connexion se dégrade. De plus, lorsque la connexion est de bonne qualité, la qualité de la vidéo doit être la meilleure possible pour garantir au spectateur une expérience agréable.
 
-Afin d'éviter les problèmes susmentionnés, certaines mesures doivent être prises lors du développement du logiciel.
+Concrètement, cela revient à mesurer le temps d'envoi d'un segment vidéo, de mesurer la durée de ce dernier, puis de comparer les deux afin d'obtenir un ratio durée_segment / durée_envoi > 1 (TODO Math). Comme nous avons connaissance du débit binaire du segment précédent, nous pouvons calculer le débit binaire de manière relativement simple, à l'aide de la formule suivante:
 
-Tout d'abord, un maximum de fonctions doivent être vérifiée par des tests unitaires, des tests d'integration, ainsi que des tests de régression. Une des difficulté va être d'effectuer des tests sur le traitement et la diffusion de la vidéo, étant donné que beaucoup de paramètres entrent en jeu et que la validité des tests est difficile à vérifier.
+DébitBinaireSegment_n := DébitBinaireSegment_{n-1} · durée_segment / durée_envoi (TODO Math)
 
-Afin de tester la transmission sur des réseaux de différentes qualités, nous pouvons brider la connexion du téléphone afin que celui-ci soit obligé de diminuer la qualité de la vidéo à transmettre. Des tests durant lesquels la connexion est totalement coupée seront aussi nécessaires. Ensuite, des tests sur le terrain nous permettront de déterminer si certaines situations ont été omises, ou _a contrario_ si l'application gère correctement les variations liées au réseau.
+Enfin, comme le temps pour encoder le segment vidéo est volontairement omis et la connexion peut être relativement instable, nous choisissons empiriquement un ratio estimant la portion de temps que prendra l'envoi du fichier par rapport à sa taille. Par exemple, pour un segment de `8 secondes` et un temps d'envoi désiré de `4 secondes`, le ratio sera de `0.5`.
 
-Concernant les problèmes de performances, il sera nécessaire d'effectuer des diagnostic et des profils d'utilisation du processeur et de la mémoire afin de s'assurer que l'application a assez de ressource pour fonctionner durant de longues périodes.
+Ainsi, la formule finale calculant le débit binaire du prochain segment est la suivante:
+
+DébitBinaireSegment_n := DébitBinaireSegment_{n-1} · ratio · durée_segment / durée_envoi (TODO Math)
+
+Ce débit sera ensuite passé à l'encodeur afin qu'il compresse la vidéo au mieux selon le format choisi.
+
+En pratique, l'application précise un débit binaire maximal et minimal afin d'éviter les cas extrèmes. En effet, en dessous d'un certain débit binaire, la vidéo devient inutilisable et il devient plus favorable d'attendre que l'utilisateur trouve une meilleure connexion. À l'inverse, une fois le débit binaire maximal atteint, on considère que la vidéo ne peut être de meilleure qualité visuellement, et qu'il est donc inutile d'ajouter de l'information.
+
+## Gestion des erreurs
+
+### Problèmes liés à la connexion
+
+# Validation
+
+Comme il est difficile d'effectuer des tests unitaires sur la capture, la conversion et l'envoi de segments vidéo, la plupart des tests étaient des tests de confiance (_sanity tests_).
+
+En premier lieu, des tests de diffusion simple ont été effectué. Le débit binaire était fixe, et le flux n'était pas lu en direct, mais une fois tous les fichiers envoyés. Cela permet de savoir si le processus de capture, conversion et envoi est fonctionnel. Ensuite, le débit binaire adaptatif a été implémenté, puis, la diffusion avec visionnage en direct a été testée.
+
+Voici les résultats des différents tests de diffusion avec visionnage en direct:
+
++-------------+--------+----------+
+| Connexion   | Durée  | Résultat |
++=============+========+==========+
+| Bonne       | 1 min  | OK       |
++-------------+--------+----------+
+| Mauvaise    | 1 min  | OK       |
++-------------+--------+----------+
+| Variable    | 3 min  | OK       |
++-------------+--------+----------+
+| Interrompue | 6 min  | OK       |
++-------------+--------+----------+
+
+Dans les deux derniers cas, le décalage entre la capture de la vidéo et sa diffusion était d'environ 25 secondes. Même si ce temps est assez court pour être considérer comme acceptable par l'utilisateur, il reste étonnamment grand. Or, après investigation, il s'avère que les fichiers vidéo sont bel et bien créés sur le serveur après une douzaine de secondes. Ce décalage est dû à la longueur du segment (~8 secondes) auquel s'ajoute son temps d'envoi (~4 secondes). Le fichier manifeste, quant à lui, est envoyé juste après le segment, mais sa faible taille rend son temps d'envoi négligeable (moins d'une seconde). Le reste du décalage, de l'ordre d'une douzaine de secondes, est alors dû au lecteur employé lors des tests afin de visionner le flux HLS. Ce lecteur est le lecteur HLS natif d'Apple qui est disponible sur iOS ainsi que Mac OS X, et également sur Safari. On peut alors supposer que ce décalage est une contrainte techinque du client ou qu'il apporte un expérience plus agréable à l'utilisateur en cas de coupure.
+
+# Problèmes rencontrés
+
+Durant le déroulement de ce projet, de nombreux problèmes ont été rencontré. Les principaux d'entre eux sont approfondis dans cette section.
+
+## Conversion vidéo à l'aide de FFmpeg
+
+La partie qui m'a posé le plus de difficulté était sans doute d'appeler les différentes fonctions de FFmpeg depuis mon code Swift. En effet, je n'avais jamais essayer de lier des bibliothèques externes à XCode et à Swift. Lorsque j'ai rencontré des erreurs à la compilation lors de l'appel au linker, il m'était impossible de savoir d'où provenait l'erreur. Elle pouvait se trouver sur une multitude de niveaux:
+
+- La cross-compilation
+- La fusion des bibliothèques statiques
+- Leur inclusion au projet XCode
+- La configuration de mon projet XCode (tant au niveau des libs que des headers)
+- L'utilisation du Bringing Header
+- L'appel aux fonctions depuis Swift
+
+De plus, certaines erreurs du linker provenaient du fait que FFmpeg a besoin des bibliothèques libssl, libcrypto et libiconv.
+
+Finalement, après de nombreux essais et renseignements sur Internet, j'ai pu convertir des vidéos d'un format à l'autre, changeant non seulement le format du conteneur mais aussi le codec utilisé.
+
+Ce prototype m'a pris de nombreuses heures à faire fonctionner parce que l'ensemble du système comporte de nombreuses couches et aussi à cause de mon manque d'expérience sur ces technologies. Cepandant, la gestion de la vidéo est une clé de voute de ce projet et ce prototype et les problèmes qu'il m'a causé m'aideront beaucoup dans la réalisation de l'application finale.
 
 # Conclusion (TODO)
 

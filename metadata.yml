@@ -5,5 +5,5 @@ lang: fr-CH
 documentclass: memoir
 mainfont: 'Linux Libertine'
 fontsize: 11pt
-abstract: 'RTS Express Live est une application mobile permettant aux journalistes de diffuser en direct des images issues de leurs téléphones. (TODO: contributions de votre projet (en d''autres termes, qu''avez-vous fait dans le contexte de RTS Express Live? Est-ce que vous avez tout développé ou bien est-ce que vous avez participé à un effort plus large?))\newpage'
+abstract: 'RTS Express Live est une application mobile permettant aux journalistes de diffuser en direct des images issues de leurs téléphones. Elle a été développée pour la RTS (Radio Télévision Suisse) dans le but d''ajouter cette fonctionnalité à la gamme RTS Express déjà existante.\newpage'
 ...
