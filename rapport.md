@@ -17,21 +17,35 @@ Ainsi, la première partie explique en détails les buts et objectifs de ce trav
 La seconde partie expose les différentes technologies existantes et explore les avantages et inconvéniants de chacune des méthodes de diffusion.  
 La troisième partie documente le travail effectué sur l'application finale ainsi que son fonctionnement.
 
-# État de l'art ("vite survolé", requiert plus de détail)
+# État de l'art
 
 Cette section présente divers aspects factuels sur la diffusion de la vidéo en direct et du développement sur iOS.
 
 ## Introduction sur les fichiers vidéo
 
-TODO:
-- conteneur
-- encodeur
-- débit binaire
-- Keyframes
+Tout comme pour les images, les données vidéo sont compressés afin que leur stockage, leur transfert et leur lecture ne demande pas trop de ressources. Et comme pour les images, il existe une multitude d'algorithme de compression. De plus, les fichiers vidéo embarquent aussi souvent une bande son, donc des données audio. Et à nouveau, les méthodes de compressions sont nombreuses.
 
+### Conteneurs et encodeurs
 
-![Exemple d'une image de vidéo peu compressée (débit binaire: 3'394 kb/s) par rapport à une image fortement compressée (débit binaire: 470 kb/s)](img/bitrate.png)
+Les fichiers vidéo sont alors organisés de la manière suivante: le fichier vidéo est un conteneur avec un fomat défini (AVI, MP4, MPEG, QuickTime, FLV, etc.). Ce conteneur va alors hébérger les données vidéo qui seront compressés selon les encodeurs supportés par le format (H.264, MPEG-4, MPEG-2, AVC, etc.) et les données audio, compressés selon les encodeurs supportés (MP3, AAC, AC-3, etc.).
 
+### Débit binaire
+
+Le débit binaire d'une vidéo est le nombre de bits qui sont envoyés en l'espace d'un certain temps. En général, il s'exprime en kilobits par seconde (kbps). C'est une mesure importante car elle est souvent proportionnelle à la qualité de la vidéo et évidement proportionnelle à sa taille.
+
+![Exemple d'une image de vidéo peu compressée (débit binaire: 3'394 kb/s) par rapport à une image fortement compressée (débit binaire: 470 kb/s). Ces images ont été capturée avec l'application RTS Express Live.](img/bitrate.png)
+
+Dans le cas de diffusion de vidéo en direct, cette notion est importante car les fichiers devant être envoyé rapidement, il est primordial que leur taille ne soit pas trop grande. On utilisera alors le concept de débit binaire adaptatif: si la connexion est bonne, on en profite pour augmenter le débit binaire et donc, la qualité de la vidéo. À l'inverse, si la connexion est mauvaise, on réduit le débit binaire de la vidéo afin de pouvoir la transferer à temps.
+
+### _Key frames_
+
+Les vidéos étant des séquences rapides d'images, on peut généralement trouver un grand nombre de similarité entre deux images successives. L'encodeur va alors en profiter pour compresser la vidéo en réutilisant les données des images précédentes. C'est ce qu'on appelle la compression temporel, la compression spacial étant alors la compression au sein d'une seul image (comme le ferait JPEG ou PNG).
+
+![Exemple de compression temporel. La première image est une key frame et les deux suivantes n'ont donc pas besoin de contenir les données de la maison car celle-ci n'a pas changé, contrairement au personnage. _Source: axis.com_](img/temporal-compression-scaled.jpg)
+
+Les _key frames_ (aussi appelées I-Frames) sont alors les images qui contiennent toutes les données nécessaires à être affichée. Elles ne reposent donc pas sur les données des images suivantes. Ces images se situent alors en début de vidéo, mais aussi toutes les $n$ images afin d'éviter de devoir garder les infomations d'images trop anciennes et aussi en cas de destruction partielle de la vidéo, afin d'éviter de trop importantes anomalies.
+
+![Exemple d'anomalie pouvant apparaitre lors du manque d'une _key frame_. _Source: forum.kodi.tv_](img/keyframe-glitch-scaled.jpg)
 
 ## Introduction au diffusion vidéo en direct
 
@@ -386,6 +400,8 @@ Par contre, le développement sur mobile peut s'avérer difficile, surtout lorsq
 
 # Références
 
+- Comparaison des formats de conteneur vidéo
+	\url{https://en.wikipedia.org/wiki/Comparison_of_video_container_formats}
 - Documentation sur AVFoundation:  
 	\url{https://developer.apple.com/library/ios/documentation/AudioVideo/Conceptual/AVFoundationPG/Articles/00_Introduction.html#//apple_ref/doc/uid/TP40010188}
 - Documentation sur AVCapture:  
