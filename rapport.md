@@ -41,11 +41,11 @@ Dans le cas de diffusion de vidéo en direct, cette notion est importante car le
 
 Les vidéos étant des séquences rapides d'images, on peut généralement trouver un grand nombre de similarité entre deux images successives. L'encodeur va alors en profiter pour compresser la vidéo en réutilisant les données des images précédentes. C'est ce qu'on appelle la compression temporel, la compression spacial étant alors la compression au sein d'une seul image (comme le ferait JPEG ou PNG).
 
-![Exemple de compression temporel. La première image est une key frame et les deux suivantes n'ont donc pas besoin de contenir les données de la maison car celle-ci n'a pas changé, contrairement au personnage. _Source: axis.com_](img/temporal-compression-scaled.jpg)
+![Exemple de compression temporel. La première image est une key frame et les deux suivantes n'ont donc pas besoin de contenir les données de la maison car celle-ci n'a pas changé, contrairement au personnage. \newline _Source: axis.com_](img/temporal-compression-scaled.jpg)
 
 Les _key frames_ (aussi appelées I-Frames) sont alors les images qui contiennent toutes les données nécessaires à être affichée. Elles ne reposent donc pas sur les données des images suivantes. Ces images se situent alors en début de vidéo, mais aussi toutes les $n$ images afin d'éviter de devoir garder les informations d'images trop anciennes et aussi en cas de destruction partielle de la vidéo, afin d'éviter de trop importantes anomalies.
 
-![Exemple d'anomalie pouvant apparaitre lors du manque d'une _key frame_. _Source: forum.kodi.tv_](img/keyframe-glitch-scaled.jpg)
+![Exemple d'anomalie pouvant apparaitre lors du manque d'une _key frame_. \newline _Source: forum.kodi.tv_](img/keyframe-glitch-scaled.jpg)
 
 ## Introduction au diffusion vidéo en direct
 
@@ -154,7 +154,8 @@ Au niveau des types de variables, Swift est aussi capable de comprendre et conve
 # Approche du problème (TODO restructuration)
 
 TODO parler du choix d'HLS
-TODO graph google trends HLS - DASH
+
+![Popularité de HLS (bleu) et de MPEG-DASH (rouge) en pourcentage de recherche Google selon les mois. \newline _Source: Google Trends_](img/google-trends.png)
 
 La première partie du projet a consisté en la familiarisation avec les technologies susmentionnées, effectuer des recherches sur l'état de l'art ainsi que sur le futur de ces différents systèmes. En effet, ce genre d'application étant relativement moderne, il est utile d'essayer de prédire comment vont se développer les technologies de diffusion vidéo ainsi que leur support. Par exemple, l'abandon progressif des technologies Flash au profit d'HTML5 par les navigateurs constitue un paramètre non négligeable dans la création d'application de demain.
 
@@ -276,7 +277,7 @@ Cette section présente le fonctionnement de l'application finale. Elle expose n
 
 L'application RTS Express Live a été développée en se basant sur des protocoles existants et à l'aide de bibliothèques permettant de mettre en place facilement lesdits protocoles.
 
-Le protocole de diffusion en direct utilisé est HLS qui est lui-même basé sur HTTP. La bibliothèque **iOS-FFmpeg-processor** développée par Hudl[^7] a été d'une grande aide pour ce projet. Utilisant elle-même FFmpeg pour le traitement de la vidéo, elle ajoute une couche d'abstraction gérant les segments et leurs caractéristiques (résolution, débit binaire, piste son, etc.) et gérant le manifest au format `.m3u8`. Néanmoins, cette bibliothèque a dû être légèrement modifiée, notamment afin de gérer correctement le débit binaire adaptatif. (TODO "et la capture de la vidéo complète"?)
+Le protocole de diffusion en direct utilisé est HLS qui est lui-même basé sur HTTP. La bibliothèque **iOS-FFmpeg-processor** développée par Hudl[^7] a été d'une grande aide pour ce projet. Utilisant elle-même FFmpeg pour le traitement de la vidéo, elle ajoute une couche d'abstraction gérant les segments et leurs caractéristiques (résolution, débit binaire, piste son, etc.) et gérant le manifest au format `M3U8`. Néanmoins, cette bibliothèque a dû être légèrement modifiée, notamment afin de gérer correctement le débit binaire adaptatif. (TODO "et la capture de la vidéo complète"?)
 
 La bibliothèque ne faisant que stocker les segments vidéo, l'envoi a dû être développé en utilisant l'API d'Apple.
 
@@ -290,20 +291,28 @@ L'application est composée de 2 vues principales. La première est un formulair
 
 La contrainte principale liée à l'interface graphique étant sa simplicité et ergonomie, tout en permettant à l'utilisateur d'accéder aux fonctionnalités principales, les outils mis à disposition par Apple ont été utilisés. Ainsi, l'interface fonctionne grâce à un _storyboard_ et une partie des actions sont gérées directement par ce dernier. Pour les actions plus complexes, des _listeners_ ont été ajouté et sont liés directement au _storyboard_.
 
-**TODO: Screeshot du storyboard**
+**TODO: Screenshot du storyboard**
 
 ## Capture et conversion de la vidéo
 
-## Envoi des segments vidéo
+La capture et la conversion de la vidéo étant gérée presque entièrement par la bibliothèque prévue à cet effet, le projet ne contient qu'une classe `LiveStream` gérant la bibliothèque. Elle reçoit les fragments vidéo grâce à une notification qui est émise par la bibliothèque. À chaque nouveau fragment, ce dernier sera envoyé et le manifeste `M3U8` sera mis à jour.
 
-`NSMutableURLRequest`
+Cette classe comporte aussi un `Uploader` qui s'occupera d'envoyer les fragemnts (voir à la section suivante). La classe `LiveStream` s'occupe alors de demander à l'`Uploader` d'envoyer les fragments vidéo, le manifeste ainsi que les métadonnées.
+
+Une fois les fragments envoyés, la classe `LiveStream` s'occupera de calculer le débit binaire du fragment suivant à l'aide de la forumle vue précédement.
+
+## Envoi des segments vidéo
 
 L'envoi des segments vidéo se fait via le protocole HTTP à l'aide de la méthode `POST`.
 
 Le projet comprend un _protocol_[^2] `Uploader` définissant les principales méthodes publiques permettant l'envoi de fichier.  
-Une classe `HTTPUploader`, héritant de `Uploader` implémente lesdites méthodes afin d'envoyer des fichier via HTTP.
+Une classe `HttpUploader`, héritant de `Uploader` implémente lesdites méthodes afin d'envoyer des fichier via HTTP.
 
 Cette architecture permet de pouvoir facilement changer de type d'Uploader dans les révisions futures de l'application. On pourrait alors imaginer un `FTPUploader` ou un `UDPUploader`, par exemple, afin d'utiliser un autre protocole.
+
+En interne, la classe `HttpUploader` comporte une queue d'envoi à effectuer. Cela permet de s'assurer que chaque fichier est reçu dans le bon ordre et que les fragments postérieurs ne perturbent ou ne ralentissent pas le transfert des fragments antérieurs. Cette queue est entièrement gérée par la classe, et la classe appelante n'a pas à se soucier de cette file.
+
+La classe `HttpUploader` utilise la classe `NSMutableURLRequest` faisant partie de l'API officielle. Cette classe permet de créer des requêtes HTTP est de les passer à une `NSURLSession` afin d'exécuter la requête asynchrone. Il est intéressant de noter que l'asynchronicité de la méthode permet d'éviter tout blocage mais la queue doit alors être gérée dans le _callback_ de la requête.
 
 [^2]: En Swift, un _protocol_ est l'équivalent d'une _interface_ Java.
 
@@ -327,9 +336,9 @@ En pratique, l'application précise un débit binaire maximal et minimal afin d'
 
 Il est intéressant de noter que seul le débit binaire de la vidéo est modifié. Le débit binaire de l'audio, lui, reste inchangé (il est de 64 kbps par défaut). La principale raison est que la qualité de l'audio est très importante en vidéo (souvent plus que la vidéo) et que la quantité de données qui lui est dédié reste négligeable par rapport à la quantité de données nécessaire à la vidéo.
 
-## Gestion des erreurs
+## Métadonnées
 
-### Problèmes liés à la connexion
+Les métadonnées sont composées du titre de la diffusion, de sa description ainsi que de mot-clés. Ces données sont entrées par l'utilisateur sur le formulaire située sur la première vue. Elles doivent obligatoirement être entrées ou un message d'alerte apparaitra. Une fois entrée, elles sont envoyées à la classe `LiveStream` afin que celle-ci les envoie au début de la diffusion, en même temps que le premier fragment vidéo.
 
 # Validation
 
@@ -359,9 +368,19 @@ Bien que ce projet soit terminé, on peut imaginer quelques améliorations. Cett
 
 ## Application (TODO)
 
-- Meilleure gestion sur les périodes hors-connexion de longue durée (stream de cave)
+### Hors-connexion 
+
+Actuellement, lorsque la connexion Internet n'est pas disponible, l'application va garder en mémoire tous les segments qui n'ont pas encore été envoyé. Une fois que la connexion est à nouveau disponible, les segments vont être tous envoyé dans l'ordre chronologique. Cette solution est fiable et efficace lorsque la coupure de connexion est relativement courte, mais si l'utilisateur pert la connexion durant une quinzaine de minutes, la quantité de données à envoyer devient rapidement grande. A priori, il y a peu de chance que cela arrive dans les conditions pour lesquelles a été développée l'application. En effet, les journalistes disposent tous de cartes SIM avec une connexion Internet illimitée en 4G. Il est alors peu probable qu'ils manquent de connexion durant une grande période. De plus, non seulement le journaliste serait conscient du manque de connexion, mais une diffusion en direct avec une coupure aussi longue serait de toute façon compromise. Cependant, nous pourrions imaginer de supprimer les segments trop ancien du flux vidéo et de n'envoyer que les segments actuels. Les spectateurs verraient alors un saut dans le flux (après une longue déconnexion), mais le flux serait toujours en direct. Avec la méthode actuelle, l'application aurait peut-être du mal à ratrapper son retard, mais une fois fait, les spectateurs pourraient toujours aller à la "fin" de la vidéo afin de visionner le direct.
+
+### Envoi de la vidéo complète
+
 - Envoi de la vidéo complète en haute définition à la fin du direct (ou de la journée)
-- Option de la caméra (luminosité, etc.)
+
+### Option de la caméra
+
+Actuellement, la caméra de l'iPhone utilise les réglages automatiques. Bien qu'ils soient généralement bons et adaptés aux diverses situations, un contrôle manuel des paramètres pourrait être le bienvenu. Ainsi, le changement de luminosité, l'activation du flash et d'autres réglages de ce genre pourrait être utilisé par le journaliste.
+
+### Tests
 
 Finalement, des tests unitaires concernant l'envoi de fichier ainsi que la conversion vidéo pourrait être mis en place. Ce type de test n'est pas évident a mettre en place et l’environnement mobile ne facilite pas la tâche. L'idéal serait de pouvoir utiliser un outil tel que FFprobe[^4] directement sur mobile afin de déterminer si les caractéristiques des segments sont correctes.
 
