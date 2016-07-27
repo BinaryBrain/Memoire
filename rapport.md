@@ -17,6 +17,22 @@ Ainsi, la première partie explique en détails les buts et objectifs de ce trav
 La seconde partie expose les différentes technologies existantes et explore les avantages et inconvénients de chacune des méthodes de diffusion.  
 La troisième partie documente le travail effectué sur l'application finale ainsi que son fonctionnement.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # État de l'art
 
 Cette section présente divers aspects factuels sur la diffusion de la vidéo en direct et du développement sur iOS.
@@ -151,6 +167,22 @@ Une fois la bibliothèque compilée pour l'iPhone, nous pouvons l'inclure dans X
 
 Au niveau des types de variables, Swift est aussi capable de comprendre et convertir les variables issues de C, par exemple.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Approche du problème (TODO restructuration)
 
 TODO parler du choix d'HLS
@@ -267,17 +299,35 @@ La sécurité des données sur le téléphone étant assurée par iOS, et les do
 
 En revanche, les segments vidéo transmis au serveur doivent être protégés. Ce niveau de sécurité doit être gérer par la partie de l'application s'occupant d'envoyer les segments sur le réseau. Heureusement, l'utilisation de HTTPS nous assure une connexion sécurisée par TLS/SSL. Il suffit alors d'utiliser un serveur muni d'un certificat TLS/SSL acceptant HTTPS et les données seront transmises de manière sûre.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Fonctionnement de l'application
 
 Cette section présente le fonctionnement de l'application finale. Elle expose non seulement son organisation interne, mais révèle également son implémentation et ses technologies utilisées.
 
 ![Schéma représentant le cheminement des segments vidéo](img/segments-flow-3.png)
 
+![Diagramme UML des classes](img/uml.png)
+
 ## Technologies utilisées
 
 L'application RTS Express Live a été développée en se basant sur des protocoles existants et à l'aide de bibliothèques permettant de mettre en place facilement lesdits protocoles.
 
-Le protocole de diffusion en direct utilisé est HLS qui est lui-même basé sur HTTP. La bibliothèque **iOS-FFmpeg-processor** développée par Hudl[^7] a été d'une grande aide pour ce projet. Utilisant elle-même FFmpeg pour le traitement de la vidéo, elle ajoute une couche d'abstraction gérant les segments et leurs caractéristiques (résolution, débit binaire, piste son, etc.) et gérant le manifest au format `M3U8`. Néanmoins, cette bibliothèque a dû être légèrement modifiée, notamment afin de gérer correctement le débit binaire adaptatif. (TODO "et la capture de la vidéo complète"?)
+Le protocole de diffusion en direct utilisé est HLS qui est lui-même basé sur HTTP. La bibliothèque **iOS-FFmpeg-processor** développée par Hudl[^7] a été d'une grande aide pour ce projet. Utilisant elle-même FFmpeg pour le traitement de la vidéo, elle ajoute une couche d'abstraction gérant les segments et leurs caractéristiques (résolution, débit binaire, piste son, etc.) et gérant le manifest au format `M3U8`. Néanmoins, cette bibliothèque a dû être légèrement modifiée, notamment afin de gérer correctement le débit binaire adaptatif.
 
 La bibliothèque ne faisant que stocker les segments vidéo, l'envoi a dû être développé en utilisant l'API d'Apple.
 
@@ -289,9 +339,11 @@ Le serveur est un serveur Apache exécutant un script PHP gérant la réception 
 
 L'application est composée de 2 vues principales. La première est un formulaire permettant de créer une nouvelle diffusion vidéo en direct et permettant d'ajouter les métadonnées de cette dernière (titre, description, mots-clés). Une fois le formulaire validé, l'utilisateur voit apparaitre la seconde vue. Elle présente un aperçu de la caméra ainsi qu'un bouton lançant la capture de la vidéo et démarrant le direct.
 
-La contrainte principale liée à l'interface graphique étant sa simplicité et ergonomie, tout en permettant à l'utilisateur d'accéder aux fonctionnalités principales, les outils mis à disposition par Apple ont été utilisés. Ainsi, l'interface fonctionne grâce à un _storyboard_ et une partie des actions sont gérées directement par ce dernier. Pour les actions plus complexes, des _listeners_ ont été ajouté et sont liés directement au _storyboard_.
+![Captures d'écran du formulaire](img/screenshots/form.png)
 
-**TODO: Screenshot du storyboard**
+![Capture d'écran de l'aperçu de la caméra](img/screenshots/5.png)
+
+La contrainte principale liée à l'interface graphique étant sa simplicité et ergonomie, tout en permettant à l'utilisateur d'accéder aux fonctionnalités principales, les outils mis à disposition par Apple ont été utilisés. Ainsi, l'interface fonctionne grâce à un _storyboard_ et une partie des actions sont gérées directement par ce dernier. Pour les actions plus complexes, des _listeners_ ont été ajouté et sont liés directement au _storyboard_.
 
 ## Capture et conversion de la vidéo
 
@@ -340,6 +392,22 @@ Il est intéressant de noter que seul le débit binaire de la vidéo est modifi�
 
 Les métadonnées sont composées du titre de la diffusion, de sa description ainsi que de mot-clés. Ces données sont entrées par l'utilisateur sur le formulaire située sur la première vue. Elles doivent obligatoirement être entrées ou un message d'alerte apparaitra. Une fois entrée, elles sont envoyées à la classe `LiveStream` afin que celle-ci les envoie au début de la diffusion, en même temps que le premier fragment vidéo.
 
+![Capture d'écran lors l'affichage de l'alerte](img/screenshots/3.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Validation
 
 Comme il est difficile d'effectuer des tests unitaires sur la capture, la conversion et l'envoi de segments vidéo, la plupart des tests étaient des tests de confiance (_sanity tests_).
@@ -362,11 +430,29 @@ Voici les résultats des différents tests de diffusion avec visionnage en direc
 
 Dans les deux derniers cas, le décalage entre la capture de la vidéo et sa diffusion était d'environ 25 secondes. Même si ce temps est assez court pour être considérer comme acceptable par l'utilisateur, il reste étonnamment grand. Or, après investigation, il s'avère que les fichiers vidéo sont bel et bien créés sur le serveur après une douzaine de secondes. Ce décalage est dû à la longueur du segment (~8 secondes) auquel s'ajoute son temps d'envoi (~4 secondes). Le fichier manifeste, quant à lui, est envoyé juste après le segment, mais sa faible taille rend son temps d'envoi négligeable (moins d'une seconde). Le reste du décalage, de l'ordre d'une douzaine de secondes, est alors dû au lecteur employé lors des tests afin de visionner le flux HLS. Ce lecteur est le lecteur HLS natif d'Apple qui est disponible sur iOS ainsi que Mac OS X, et également sur Safari. On peut alors supposer que ce décalage est une contrainte technique due au débit binaire adaptatif du côté du client ou qu'il apporte un expérience plus agréable à l'utilisateur en cas de coupure.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Proposition d'amélioration
 
 Bien que ce projet soit terminé, on peut imaginer quelques améliorations. Cette section discute alors des modifications et ajouts possibles sur l'application iOS, le serveur ainsi que le client web.
 
 ## Application (TODO)
+
+Bien que fonctionnelle, l'application pourrait être amélioré sur certains points.
 
 ### Hors-connexion 
 
@@ -374,7 +460,7 @@ Actuellement, lorsque la connexion Internet n'est pas disponible, l'application 
 
 ### Envoi de la vidéo complète
 
-- Envoi de la vidéo complète en haute définition à la fin du direct (ou de la journée)
+TODO Envoi de la vidéo complète en haute définition à la fin du direct (ou de la journée)
 
 ### Option de la caméra
 
@@ -395,6 +481,22 @@ Le serveur qui a été développé dans ce projet n'a été créé qu'à des fin
 Le client web n'ayant étant fait que pour accélérer les tests ainsi que pour les démonstrations, il n'est pas très élaboré et pourrait largement être amélioré. Tout d'abord, lorsqu'un nouveau flux vidéo est créé, l'utilisateur doit actuellement actualiser sa page. On pourrait imaginer que le client reçoive une notification du serveur (par exemple via web socket) et mette à jour lui-même sa page.
 
 De plus, le lecteur HLS (développé par Dailymotion) utilisé a parfois un comportement étrange. Il s'arrête à la fin d'un segment comme s'il essayait de télécharger le suivant, mais télécharge ceux qui se situe encore après, bloquant ainsi le flux durant un certain temps. Pourtant, les segments vidéo sont correctement stockés sur le serveur et sont prêts à être téléchargés.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Problèmes rencontrés
 
@@ -421,6 +523,22 @@ Ce prototype m'a pris de nombreuses heures à faire fonctionner parce que l'ense
 
 Afin de tester l'envoi de fichier vers un serveur via des requêtes POST en HTTP, un serveur Express (en Node.js) a été créé. L'envoi semblait alors marcher correctement mais très souvent (près d'une fois sur cinq), l'envoi du fichier prenait trop de temps et le timeout de 30 secondes de l'application iPhone se déclenchait. Pourtant, l'iPhone ayant une bonne connexion Wi-Fi, cela n'aurait pas dû arriver. Après une longue et infructueuse investigation, un second serveur, en PHP cette fois, a été mis en place. L'envoi de fichier n'a alors plus posé de problème et l'application le flux en direct a largement gagné en fluidité.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Conclusion
 
 ## Recherche
@@ -438,6 +556,22 @@ De plus, les tests ont montré que ses resources sont gérées au mieux et qu'el
 Ce travail m'a beaucoup plu car j'ai pu y découvrir un ensemble de technologies qui m'étaient inconnues. J'ai particulièrement apprécié la découverte du langage de programmation Swift et l'apprentissage des différents protocoles et formats de diffusion direct de vidéo. Étant passionné des nouveaux langages de programmation et de leur concept (Scala, Rust, Julia, etc.), je suis content d'avoir eu l'occasion d'aborder Swift et je pense que je l'utiliserai volontiers dans le cadre d'un autre projet.
 
 Par contre, le développement sur mobile peut s'avérer difficile, surtout lorsqu'on souhaite effectuer des opérations relativement bas niveau. Typiquement, j'ai passé beaucoup de temps sur la conversion de fichier vidéo à l'aide de FFmpeg et une fois que mon code était fonctionnel, il s'avérait que l'ensemble de la conversion était relativement instable et qu'il manquait encore beaucoup de chose (encodage en H264, modification du débit binaire, etc.). J'aurais peut-être dû directement essayer d'utiliser la bibliothèque de Hudl mais cela ne m'aurait pas permis de comprendre le fonctionnement et les enjeux de la conversion vidéo et de la diffusion en direct.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Références
 
