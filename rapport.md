@@ -104,7 +104,6 @@ Afin de créer un flux vidéo au débit adaptatif, il est possible de préciser 
 HLS est stable, utilisé depuis plusieurs années et populaire mais peu de navigateur l'implémente nativement. Heureusement, avec l'arrivée des _Media Source Extensions_[^3], plusieurs lecteurs HLS écrit en JavaScript existent.
 
 Exemple de manifeste M3U8:
-TODO mise en page
 
 ```
 #EXTM3U
@@ -376,6 +375,9 @@ La capture et la conversion de la vidéo étant gérée presque entièrement par
 Cette classe comporte aussi un `Uploader` qui s'occupera d'envoyer les fragemnts (voir à la section suivante). La classe `LiveStream` s'occupe alors de demander à l'`Uploader` d'envoyer les segments vidéo, le manifeste ainsi que les métadonnées.
 
 Une fois les segments envoyés, la classe `LiveStream` s'occupera de calculer le débit binaire du segment suivant à l'aide de la forumle vue précédement.
+
+La résolution de la vidéo est de $1280\times720$ au codec vidéo H.264 à 60 images par seconde.  
+La piste audio est encodée en AAC avec un échantillonage de 44100 Hz.
 
 ## Envoi des segments vidéo
 
