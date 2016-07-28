@@ -1,6 +1,6 @@
 ---
-title: '\protect\parbox{\textwidth}{\protect\centering Travail de Bachelor\\ Développement d''une application de diffusion vidéo en direct\\ RTS Express Live\\ \enskip \\Haute Ecole d''Ingénierie et de Gestion du Canton de Vaud}'
-author: '\protect\parbox{\textwidth}{\protect\centering Auteur: Sacha Bron\\ Superviseurs:\\ Olivier Liechti – Professeur à l''HEIG-VD\\ Sébastien Noir – Chef de projet à la RTS}'
+title: '\protect\parbox{\textwidth}{\protect\centering Travail de Bachelor\\ Développement d''une application de diffusion vidéo en direct\\ RTS Express Live}'
+author: '\protect\parbox{\textwidth}{\protect\centering Haute Ecole d''Ingénierie et de Gestion du Canton de Vaud\\ \enskip \\ Auteur: Sacha Bron\\ Superviseurs:\\ Olivier Liechti – Professeur à l''HEIG-VD\\ Sébastien Noir – Chef de projet à la RTS\\ \enskip \\ Printemps 2016}'
 lang: fr-CH
 documentclass: memoir
 mainfont: 'Linux Libertine'

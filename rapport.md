@@ -610,6 +610,8 @@ Par contre, le développement sur mobile peut s'avérer difficile, surtout lorsq
 
 # Références
 
+Toutes les pages étaient consultables le 28 juillet 2016. 
+
 - Comparaison des formats de conteneur vidéo
 	\url{https://en.wikipedia.org/wiki/Comparison_of_video_container_formats}
 - Documentation sur AVFoundation:  
@@ -626,6 +628,10 @@ Par contre, le développement sur mobile peut s'avérer difficile, surtout lorsq
 	\url{https://developer.mozilla.org/en-US/docs/Web/HTML/DASH_Adaptive_Streaming_for_HTML_5_Video}
 - Documentation sur les Bridging Headers:  
 	\url{https://developer.apple.com/library/ios/documentation/Swift/Conceptual/BuildingCocoaApps/MixandMatch.html}
+- Specification de format MP4:
+	\url{http://xhelmboyx.tripod.com/formats/mp4-layout.txt}
+- Specification de format MP4:
+	\url{http://atomicparsley.sourceforge.net/mpeg-4files.html}
 - Documentation de FFmpeg:  
 	\url{http://www.ffmpeg.org/}
 - Tutoriel sur la capture vidéo sur iOS:  
