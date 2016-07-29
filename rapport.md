@@ -4,7 +4,7 @@ Dans le monde connecté d'aujourd'hui, l'information instantanée prend de l'amp
 
 Ce phénomène contraint les médias "classiques" à continuer à s'adapter aux nouvelles technologies de communication. La diffusion d'information en direct prend alors une place de plus en plus importante afin d'atteindre ce nouveau public friand d'instantané. La RTS (Radio Télévision Suisse) fait partie de ces médias dont la popularité est en jeu. Il n'est donc pas étonnant qu'ils souhaitent aussi participer à l'expansion de cette nouvelle manière de partager l'information. Bien évidemment, les émissions et retransmissions d'événements en direct ne sont pas choses nouvelles pour une chaîne de télévision mais la différence réside aussi dans la manière de procéder. En effet, en ayant une application de diffusion en direct sur leurs téléphones, les journalistes ont la liberté de créer du contenu à tout moment et sans préparation. Cela peut être très pratique pour émettre les images d'un festival de musique, d'un incendie qui vient de débuter ou encore d'interviewer une personnalité que l'on croiserait par hasard.
 
-C'est pourquoi la RTS a proposé à l'HEIG-VD un travail de Bachelor ayant pour sujet la création d'une application pour iPhone permettant la diffusion en direct des images prises par sa caméra, intégré dans une interface donnant la possibilité aux journalistes d'ajouter des informations utiles concernant la capture. Ce travail a alors été effectué en collaboration avec la RTS qui a, entre autre, fourni le cahier des charges et qui a su fournir de bons conseils pour approcher le problème. De plus, la RTS donner le cadre d'utilisation de l'application ainsi que la manière donc elle devait être intégrée à leur environement.
+C'est pourquoi la RTS a proposé à l'HEIG-VD un travail de Bachelor ayant pour sujet la création d'une application pour iPhone permettant la diffusion en direct des images prises par sa caméra, intégré dans une interface donnant la possibilité aux journalistes d'ajouter des informations utiles concernant la capture. Ce travail a alors été effectué en collaboration avec la RTS qui a, entre autre, fourni le cahier des charges et qui a su fournir de bons conseils pour approcher le problème. De plus, la RTS donner le cadre d'utilisation de l'application ainsi que la manière donc elle devait être intégrée à leur environnement.
 
 Ce projet est constitué de trois phases:
 
@@ -17,16 +17,14 @@ Ce rapport explique en détail le travail qui a été effectué durant ces diff�
 Ainsi, la première partie explique en détails les buts et objectifs de ce travail selon les contraintes données par la RTS.  
 La seconde partie expose les différentes technologies existantes et explore les avantages et inconvénients de chacune des méthodes de diffusion.  
 La troisième partie documente le travail effectué sur l'application finale ainsi que son fonctionnement.
-Pour terminer, des propositions d'amélioration seront exporées et discutées.
-
-
+Pour terminer, des propositions d'amélioration seront explorées et discutées.
 
 
 
 
 # Cahier des charges
 
-Ce cahier des charges a été écrit avec la RTS.
+Ce cahier des charges a été co-écrit avec le responsable de projet de la RTS, Sébastien Noir.
 
 ## Contexte
 
@@ -57,11 +55,11 @@ L'application doit être capable de diffuser de la vidéo en direct depuis un iP
 
 L'utilisateur peut ajouter des métadonnées au flux comme le titre, la description ainsi que des mots-clés. L'application doit être rapide est agréable à utiliser. Son interface graphique doit être instinctive et facile d'utilisation.
 
-L'application doit être assez modulaire pour s'intégrer dans l'environement de travail de la RTS. De plus, le code doit être commenté et la sécurité des données doit être maitrisée. Des tests automatisés doivent être réalisé.
+L'application doit être assez modulaire pour s'intégrer dans l'environnement de travail de la RTS. De plus, le code doit être commenté et la sécurité des données doit être maitrisée. Des tests automatisés doivent être réalisé.
 
-Diverses solutions techniques doivent être explorées et documentées, notamment.
+Diverses solutions techniques doivent être explorées et documentées, notamment pour l'encodage de la vidéo et pour la transmission des images. Si possible, des protocoles déjà existant doivent être utilisés.
 
-## Ojectifs secondaires
+## Objectifs secondaires
 
 L'application doit être intégrée avec l'application RTS Express existante. Dans l'idéal, l'application est disponible sous forme de module pouvant être intégrée à n'importe quelle application iOS.
 
@@ -166,7 +164,7 @@ MPEG-DASH (MPEG pour Moving Picture Experts Group et et DASH pour Dynamic Adapti
 
 Ce protocole nécessite d'avoir des segments vidéo ne contenant que les données de la vidéo (et non les en-têtes). Il faut alors stocker les en-têtes dans un fichier séparé.
 
-MPEG-DASH se repose aussi sur l'utilisation d'un manifeste contenant des liens vers les segments vidéo ainsi que des meta-données. Ces fichiers sont en XML.
+MPEG-DASH se repose aussi sur l'utilisation d'un manifeste contenant des liens vers les segments vidéo ainsi que des meta-données. Ce manifeste est en XML. Il contient toutes les informations nécessaires pour que le client bénéficie d'un débit binaire adaptatif. Il contient également des informations sur le format des fichiers vidéo, ainsi que sur leur compression audio et vidéo. De plus, il est possible d'exprimer les adresses des fichiers de manière paramétrable. Le flux vidéo peut donc se faire sur une durée indéterminée sans qu'une modification du manifeste soit nécessaire.
 
 Support des différentes technologies selon les navigateurs[^1]:
 
@@ -380,8 +378,6 @@ En revanche, les segments vidéo transmis au serveur doivent être protégés. C
 
 Cette section présente le fonctionnement de l'application finale. Elle expose non seulement son organisation interne, mais révèle également son implémentation et ses technologies utilisées.
 
-![Schéma représentant le cheminement des segments vidéo](img/segments-flow-3.png)
-
 ![Diagramme UML des classes](img/uml.png)
 
 ## Technologies utilisées
@@ -410,12 +406,14 @@ La contrainte principale liée à l'interface graphique étant sa simplicité et
 
 La capture et la conversion de la vidéo étant gérée presque entièrement par la bibliothèque prévue à cet effet (`iOS-FFmpeg-processor`), le projet ne contient qu'une classe `LiveStream` gérant la bibliothèque. Elle reçoit les segments vidéo grâce à une notification qui est émise par la bibliothèque. À chaque nouveau segment, ce dernier sera envoyé et le manifeste M3U8 sera mis à jour.
 
-Cette classe comporte aussi un `Uploader` qui s'occupera d'envoyer les fragemnts (voir à la section suivante). La classe `LiveStream` s'occupe alors de demander à l'`Uploader` d'envoyer les segments vidéo, le manifeste ainsi que les métadonnées.
+![Schéma représentant le cheminement des segments vidéo](img/segments-flow-3.png)
 
-Une fois les segments envoyés, la classe `LiveStream` s'occupera de calculer le débit binaire du segment suivant à l'aide de la forumle vue précédement.
+Cette classe comporte aussi un `Uploader` qui s'occupera d'envoyer les segments (voir à la section suivante). La classe `LiveStream` s'occupe alors de demander à l'`Uploader` d'envoyer les segments vidéo, le manifeste ainsi que les métadonnées.
+
+Une fois les segments envoyés, la classe `LiveStream` s'occupera de calculer le débit binaire du segment suivant à l'aide de la formule vue précédemment.
 
 La résolution de la vidéo est de $1280\times720$ au codec vidéo H.264 à 60 images par seconde.  
-La piste audio est encodée en AAC avec un échantillonage de 44100 Hz.
+La piste audio est encodée en AAC avec un échantillonnage de 44100 Hz.
 
 ## Envoi des segments vidéo
 
@@ -462,7 +460,18 @@ Les métadonnées sont composées du titre de la diffusion, de sa description ai
 
 Une fois les métadonnées entrées, elles sont envoyées à la classe `LiveStream` afin que celle-ci les envoie au début de la diffusion, en même temps que le premier segment vidéo.
 
+Le fichier contenant les métadonnées est organisé de la manière suivante (les retours à la ligne son signalé par le caractère `\n`):
 
+```
+Titre\n
+Mot-clé 1, mot-clé 2, ..., mot-clé n\n
+Description ligne 1\n
+Description ligne 2\n
+...\n
+Description ligne n\n
+```
+
+Cette solution permet d'avoir une description multi-ligne sans devoir la baliser. Le client lira alors le fichier de la même manière et pourra séparer les mots-clés entre chaque virgule.
 
 
 
@@ -479,9 +488,7 @@ Une fois les métadonnées entrées, elles sont envoyées à la classe `LiveStre
 
 # Validation
 
-Comme il est difficile d'effectuer des tests unitaires sur la capture, la conversion et l'envoi de segments vidéo, la plupart des tests étaient des tests de confiance (_sanity tests_).
-
-Les tests de ce chapitre ont été réalisés avec un iPhone 5C.
+Comme il est difficile d'effectuer des tests unitaires sur la capture, la conversion et l'envoi de segments vidéo, la plupart des tests étaient des tests de confiance (_sanity tests_). Les tests de ce chapitre ont été réalisés avec un iPhone 5C.
 
 ## Tests de diffusion avec diverses qualités de connexion
 
@@ -507,11 +514,11 @@ Les tests effectués se sont avérés être concluant.
 
 ## Latence
 
-Dans les deux derniers cas, le décalage entre la capture de la vidéo et sa diffusion était d'environ 25 secondes. Même si ce temps est assez court pour être considérer comme acceptable par l'utilisateur, il reste étonnamment grand. Or, après investigation, il s'avère que les fichiers vidéo sont bel et bien créés sur le serveur après une douzaine de secondes. Ce décalage est dû à la longueur du segment (~8 secondes) auquel s'ajoute son temps d'envoi (~4 secondes). Le fichier manifeste, quant à lui, est envoyé juste après le segment, mais sa faible taille rend son temps d'envoi négligeable (moins d'une seconde). Le reste du décalage, de l'ordre d'une douzaine de secondes, est alors dû au lecteur employé. Ce lecteur est le lecteur HLS natif d'Apple qui est disponible sur iOS ainsi que sur Safari sur Mac OS X. On peut alors supposer que ce décalage est une contrainte technique due au débit binaire adaptatif du côté du client ou qu'il apporte un expérience plus agréable à l'utilisateur en cas de coupure.
+Dans les deux derniers cas, le décalage entre la capture de la vidéo et sa diffusion était d'environ 25 secondes. Même si ce temps est assez court pour être considéré comme acceptable par l'utilisateur, il reste étonnamment grand. Or, après investigation, il s'avère que les fichiers vidéo sont bel et bien créés sur le serveur après une douzaine de secondes. Ce décalage est dû à la longueur du segment (~8 secondes) auquel s'ajoute son temps d'envoi (~4 secondes). Le manifeste, quant à lui, est envoyé juste après le segment, mais sa faible taille rend son temps d'envoi négligeable (moins d'une seconde). Le reste du décalage, de l'ordre d'une douzaine de secondes, est alors dû au lecteur employé. Ce lecteur est le lecteur HLS natif d'Apple qui est disponible sur iOS ainsi que sur Safari sur Mac OS X. On peut alors supposer que ce décalage est une contrainte technique due au débit binaire adaptatif du côté du client ou qu'il apporte un expérience plus agréable à l'utilisateur en cas de coupure.
 
 ## Réactivité
 
-Comme le calcul du changement de débit binaire se fait après l'envoi d'un segment, le segment courrant est alors inchangé et c'est uniquement le segment d'après qui verra son débit binaire modifié. Avec l'application actuelle et ses segments de 8 secondes, cela signifie que si la connexion se déteriore soutainement, il faudra attendre 8 secondes avant que le débit binaire soit effectivement diminué.
+Comme le calcul du changement de débit binaire se fait après l'envoi d'un segment, le segment courant est alors inchangé et c'est uniquement le segment futur qui verra son débit binaire modifié. Avec l'application actuelle et ses segments de 8 secondes, cela signifie que si la connexion se détériore soudainement, il faudra attendre 8 secondes avant que le débit binaire soit effectivement diminué.
 
 ## Performances
 
@@ -527,7 +534,7 @@ Tout d'abord, l'utilisation du processeur n'est que de ~17% avec quelques piques
 
 Il est également intéressant de voir que le taux d'utilisation de la mémoire vive est stable. Cela est très bon signe car cela signifie que toutes les ressources inutilisées sont libérées et qu'il n'y a donc pas de fuite de mémoire.
 
-La consommation énérgétique varie entre "élevée" et "très élevée". C'est un résultat qui était attendu à cause de l'utilisation de la caméra, de l'encodeur vidéo et du réseau.
+La consommation énergétique varie entre "élevée" et "très élevée". C'est un résultat qui était attendu à cause de l'utilisation de la caméra, de l'encodeur vidéo et du réseau.
 
 Les transferts sur le disque et sur le réseau sont aussi ceux attendus. De plus, comme ils sont de courte durée, cela ne pose pas de problème pour le fonctionnement du téléphone. Cela dit, lors de ce test, le téléphone bénéficiait d'une connexion de très bonne qualité et n'avait donc aucun problème à envoyer les segments. Comme susmentionné, le transfert peut prendre jusqu'à $0.7\times8s = 5.6s$ en cas de mauvaise connexion, ou même toute la durée d'un segment au cas où la connexion s'est rapidement détériorée et que les segments ont encore un débit binaire élevé.
 
@@ -554,15 +561,15 @@ Bien que fonctionnelle, l'application pourrait être amélioré sur certains poi
 
 Une fois la diffusion en direct terminée, il serait intéressant que l'utilisateur dispose de la vidéo complète et qu'il ait accès à une vue permettant de transmettre la vidéo de bonne qualité au serveur. Cette fonctionnalité est un objectif qui n'a pas été atteint pour plusieurs raisons.
 
-Premièrement, la bibliothèque utilisée n'est pas documentée et l'ajout de fonctionnalité (tel que le débit adaptatif) peut s'avérer être fastidieux. Dans ce cas précis, il était difficile de trouver à quel endroit implémenter une telle fonctionnalité, même après une longue étape de rétro-ingénierie. De multiples essais ont été effectué afin de récupérer des données de la caméra en parallèle avec la bibliothèque, mais aucun n'a atteind son but.
+Premièrement, la bibliothèque utilisée n'est pas documentée et l'ajout de fonctionnalité (tel que le débit adaptatif) peut s'avérer être fastidieux. Dans ce cas précis, il était difficile de trouver à quel endroit implémenter une telle fonctionnalité, même après une longue étape de rétro-ingénierie. De multiples essais ont été effectué afin de récupérer des données de la caméra en parallèle avec la bibliothèque, mais aucun n'a atteint son but.
 
-De plus, même si cette fonctionnalité avait été effectuée avec succès sur un prototype, la gesion de la segmentation était profondément différente. Une étape considérée comme maitrisée et reproductible ne l'était finalement pas.
+De plus, même si cette fonctionnalité avait été effectuée avec succès sur un prototype, la gestion de la segmentation était profondément différente. Une étape considérée comme maitrisée et reproductible ne l'était finalement pas.
 
 Enfin, la documentation d'Apple sur les erreurs rencontrées était inexistante et les divers forums et _mailing lists_ n'ont pas été d'une grande aide non plus.
 
 ### Hors-connexion 
 
-Actuellement, lorsque la connexion Internet n'est plus disponible, l'application va garder en mémoire tous les segments qui n'ont pas encore été envoyé. Une fois que la connexion est à nouveau disponible, les segments vont être tous envoyé dans l'ordre chronologique. Cette solution est fiable et efficace lorsque la coupure de connexion est relativement courte, mais si l'utilisateur perd la connexion durant une quinzaine de minutes, la quantité de données à envoyer devient rapidement grande. A priori, il y a peu de chance que cela arrive dans les conditions pour lesquelles a été développée l'application. En effet, les journalistes disposent tous de cartes SIM avec une connexion Internet illimitée en 4G. Il est alors peu probable qu'ils manquent de connexion durant une longue période. De plus, non seulement le journaliste serait conscient du manque de connexion, mais une diffusion en direct avec une coupure aussi longue serait de toute façon compromise. Cependant, nous pourrions imaginer de supprimer les segments trop anciens du flux vidéo et de n'envoyer que les segments actuels. Les spectateurs verraient alors un saut dans le flux (après une longue déconnexion), mais le flux serait toujours en direct. Avec la méthode actuelle, l'application aurait peut-être du mal à ratrapper son retard, mais une fois fait, les spectateurs pourraient toujours aller à la "fin" de la vidéo afin de visionner le direct.
+Actuellement, lorsque la connexion Internet n'est plus disponible, l'application va garder en mémoire tous les segments qui n'ont pas encore été envoyé. Une fois que la connexion est à nouveau disponible, les segments vont être tous envoyé dans l'ordre chronologique. Cette solution est fiable et efficace lorsque la coupure de connexion est relativement courte, mais si l'utilisateur perd la connexion durant une quinzaine de minutes, la quantité de données à envoyer devient rapidement grande. A priori, il y a peu de chance que cela arrive dans les conditions pour lesquelles a été développée l'application. En effet, les journalistes disposent tous de cartes SIM avec une connexion Internet illimitée en 4G. Il est alors peu probable qu'ils manquent de connexion durant une longue période. De plus, non seulement le journaliste serait conscient du manque de connexion, mais une diffusion en direct avec une coupure aussi longue serait de toute façon compromise. Cependant, nous pourrions imaginer de supprimer les segments trop anciens du flux vidéo et de n'envoyer que les segments actuels. Les spectateurs verraient alors un saut dans le flux (après une longue déconnexion), mais le flux serait toujours en direct. Avec la méthode actuelle, l'application aurait peut-être du mal à rattraper son retard, mais une fois fait, les spectateurs pourraient toujours aller à la "fin" de la vidéo afin de visionner le direct.
 
 ### Options de la caméra
 
@@ -653,7 +660,7 @@ L'application est stable et fonctionne correctement. Son interface est facile d'
 
 De plus, les tests ont montré que ses resources sont gérées au mieux et qu'elle est prête à être utilisée sur le terrain.
 
-Néanmoins, la mise à disposition de la vidéo en haute qualité à la fin d'une diffusion manque et l'application n'a pas été entièrement intégrée avec l'environement existant de la RTS. Cependant, l'entier du projet a été créé de manière modulaire et standard afin que son intégration ou sa modification puisse se faire facilement.
+Néanmoins, la mise à disposition de la vidéo en haute qualité à la fin d'une diffusion manque et l'application n'a pas été entièrement intégrée avec l’environnement existant de la RTS. Cependant, l'entier du projet a été créé de manière modulaire et standard afin que son intégration ou sa modification puisse se faire facilement.
 
 ## Conclusion personnelle
 
@@ -661,8 +668,7 @@ Ce travail m'a beaucoup plu car j'ai pu y découvrir un ensemble de technologies
 
 Par contre, le développement sur mobile peut s'avérer difficile, surtout lorsqu'on souhaite effectuer des opérations relativement bas niveau. Typiquement, j'ai passé beaucoup de temps sur la conversion de fichier vidéo à l'aide de FFmpeg et une fois que mon code était fonctionnel, il s'avérait que l'ensemble de la conversion était relativement instable et qu'il manquait encore beaucoup de chose (encodage en H264, modification du débit binaire, etc.). J'aurais peut-être dû directement essayer d'utiliser la bibliothèque de Hudl mais cela ne m'aurait pas permis de comprendre le fonctionnement et les enjeux de la conversion vidéo et de la diffusion en direct.
 
-
-
+Pour finir, je tiens à remercier mes superviseurs, Olivier Liechti et Sébastien Noir pour m'avoir guidé dans ce travail et de m'avoir fourni les clés et les outils nécessaires pour me permettre d'avancer.
 
 
 
@@ -717,3 +723,41 @@ Toutes les pages étaient consultables le 28 juillet 2016.
 	\url{https://github.com/bbcallen/ijkplayer/blob/fc70895c64cbbd20f32f1d81d2d48609ed13f597/ios/tools/do-compile-ffmpeg.sh}
 - Wrapper de FFmpeg pour convertir des vidéos:  
 	\url{https://github.com/OpenWatch/FFmpegWrapper}
+
+
+
+
+
+
+
+
+# Annexes
+
+## Manuel d'installation
+
+Ce manuel décrit la procédure à suivre afin de tester l'application.
+
+### Installation de l'application iPhone
+
+L'installation de l'application est relativement simple. Toutefois, il faut penser à modifier quelques paramètres.
+
+1) Ouvrez le projet Xcode RTS-Express-Live.
+2) Ouvrez le fichier `ViewController.swift` et modifiez l'adresse située à la ligne 23. Cette adresse doit être l'adresse du serveur qui va recevoir les fichiers vidéo.
+
+L'application est alors prête à être installée et lancée sur le téléphone.
+
+Optionnellement, il est possible de changer certains paramètres vidéo.
+
+- Les débits binaires maximal et minimal ainsi que le ratio peuvent être modifié aux ligne 19 à 21 du fichier `LiveStream.swift`.
+- Pour modifier des paramètre avancés sur la vidéo ou l'audio, les paramètres proviennent de la bibliothèque jointe et sont contenus dans `Classes/Inputs/KFRecorder.m`.
+- Les données envoyées par requête POST se trouvent dans le fichier `HttpUploader.swift`. Par exemple, on peut y changer le dossier de destination à la ligne 47.
+
+### Installation du serveur
+
+Ce serveur a été développé à des fins de test et n'a pas été sécurisé. Il ne faut en aucun cas le déployer tel quel sur un serveur de production.
+
+Le fichier `index.php` situé sur le serveur Apache doit être atteignable depuis le téléphone via l'adresse précisée dans la section précédante.
+
+Le formulaire disponible sur `index.php` peut-être utilisé afin de tester l'ajout de fichier de manière manuel.
+
+La page `viewer.php` permet de voir les flux vidéo en direct. En cliquant sur les liens, on peut également voir les anciennes diffusions. Les liens "info" permettent d'afficher les métadonnées des flux.
