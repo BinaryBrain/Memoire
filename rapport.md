@@ -744,6 +744,8 @@ L'installation de l'application est relativement simple. Toutefois, il faut pens
 1) Ouvrez le projet Xcode RTS-Express-Live.
 2) Ouvrez le fichier `ViewController.swift` et modifiez l'adresse située à la ligne 23. Cette adresse doit être l'adresse du serveur qui va recevoir les fichiers vidéo.
 
+Si certains fichiers s'affichent en rouge dans le menu de gauche, il faut les localiser manuellement. Les bibliothèques (fichiers `.dylib`) sont situées dans `/usr/lib/`. Cette opération peut aussi s'effectuer directement dans l'onglet "Build Phase" du projet Xcode de l'application et dans le projet Xcode de la bibliothèque HudlFFmpegProcessor.
+
 L'application est alors prête à être installée et lancée sur le téléphone.
 
 Optionnellement, il est possible de changer certains paramètres vidéo.
