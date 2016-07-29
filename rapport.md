@@ -24,15 +24,50 @@ Pour terminer, des propositions d'amélioration seront exporées et discutées.
 
 
 
+# Cahier des charges
 
+Ce cahier des charges a été écrit avec la RTS.
 
+## Contexte
 
+La RTS (Radio Télévision Suisse) propose à côté de son offre télévision/radio traditionnelle une large gamme de produits en ligne: Play RTS, RTS Sport, RTS Info, RTS Radio, RTS Kids.
 
+La publication de contenus vidéos en direct a profondément changé récemment, avec l'arrivée d'application mobile telles que Meerkat et Persicope. La RTS souhaite donc se doter d'un outil permettant aux journalistes de publier immédiatement en direct des vidéos sur le terrain.
 
+## Domaines de recherche
 
+Les domaines de recherche sont multiples:
 
+- Développement mobile
+- Gestion des médias
+- Capture vidéo
+- Compression vidéo
+- Réseau
+- Sécurité
+- Programmation Orientée Objet
+- UI/UX
 
+## But
 
+Ce travail consiste à offrir la possibilité aux journalistes de diffuser en direct de la vidéo depuis leur téléphone.
+
+## Objectifs principaux
+
+L'application doit être capable de diffuser de la vidéo en direct depuis un iPhone. La vidéo doit être de bonne qualité et inclure la piste audio provenant du microphone. La qualité du flux vidéo doit être aussi bonne que possible et s'adapter aux contraintes du réseau (baisse de débit et coupures). Une fois la diffusion en direct terminée, l'utilisateur dispose de l'entier de la vidéo en haute qualité, c'est-à-dire sans les compressions nécessaires au direct.
+
+L'utilisateur peut ajouter des métadonnées au flux comme le titre, la description ainsi que des mots-clés. L'application doit être rapide est agréable à utiliser. Son interface graphique doit être instinctive et facile d'utilisation.
+
+L'application doit être assez modulaire pour s'intégrer dans l'environement de travail de la RTS. De plus, le code doit être commenté et la sécurité des données doit être maitrisée. Des tests automatisés doivent être réalisé.
+
+Diverses solutions techniques doivent être explorées et documentées, notamment.
+
+## Ojectifs secondaires
+
+L'application doit être intégrée avec l'application RTS Express existante. Dans l'idéal, l'application est disponible sous forme de module pouvant être intégrée à n'importe quelle application iOS.
+
+Le temps de propagation, c'est-à-dire la latence entre la captation et la diffusion doit être minimisée. Elle ne doit en tout cas pas dépasser plus de 60 secondes.
+
+Le flux vidéo est disponible également sur des plateformes tierces, tel que YouTube.
 
 # État de l'art
 

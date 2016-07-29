@@ -5,6 +5,6 @@ lang: fr-CH
 documentclass: memoir
 mainfont: 'Linux Libertine'
 fontsize: 11pt
-abstract: 'RTS Express Live est une application mobile permettant aux journalistes de diffuser en direct des images issues de leurs téléphones. Elle a été développée pour la RTS (Radio Télévision Suisse) dans le but d''ajouter cette fonctionnalité à la gamme RTS Express déjà existante.\pagenumbering{gobble}
- \clearpage \enskip \clearpage \pagenumbering{arabic} \setcounter{page}{3}'
+abstract: 'La diffusion de vidéo en direct gagne en popularité de jour en jour sur Internet et plus particulièrement sur les réseaux sociaux. Les médias classiques tel que la RTS (Radio Télévision Suisse) doivent s''adapter afin d''atteindre ce nouveau public. Le développement d''un application mobile dédiée aux journalistes de la RTS est alors nécessaire. Cette application iPhone nommée RTS Express Live donne la possibilité de créer des flux vidéo s''adaptant à la qualité du réseau et apparenté à des métadonnées. Elle peut être facilement intégrée dans n''importe quel environment. \pagenumbering{gobble} \clearpage \enskip \clearpage \pagenumbering{arabic} \setcounter{page}{3}
+'
 ...
