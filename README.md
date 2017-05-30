@@ -1,3 +1,5 @@
+_<small>Compiled with: `pandoc -N README.md metadata.yml --toc -o rapport.pdf --latex-engine=xelatex --dpi=300`</small>_
+
 # Introduction
 
 Dans le monde connecté d'aujourd'hui, l'information instantanée prend de l'ampleur à travers des vecteurs divers. Les différents réseaux sociaux soutiennent ce mouvement en incitant son public à partager du texte, des clichés ou encore de la vidéo. En effet, de nombreuses applications et sites web voient le jour chaque année. Parmi eux, les plus connus sont Twitch.tv: un site web de diffusion vidéo en direct utilisé surtout par les amateurs de jeu vidéo, Periscope: une application mobile permettant la diffusion en direct depuis la caméra du smartphone vers d'autres smartphones à travers le monde, et la majorité des grands acteurs du web ont ajouté cette fonctionnalité à leurs sites web: YouTube, Facebook, Snapchat, etc.
